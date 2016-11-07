@@ -8,6 +8,7 @@ ROS code to run our autonomous ground robot for Fundamentals of Robotics 2016
 
 ## Git Guidelines
 Never push directly to master (in fact, you won't be able to). Instead:
+
 1. Create a branch for your features (`git checkout -b <branchname>`)
 2. Push to the corresponding branch on Github (`git push origin <branchname>`)
 3. If you would like your code to be merged into master (ie. you are done with your feature), submit a pull request on Github
