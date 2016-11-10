@@ -7,9 +7,6 @@
 #include "geometry_msgs/Vector3Stamped.h"
 #include "sensor_msgs/NavSatFix.h"
 
-#include "std_msgs/Int32.h"
-#include "std_msgs/Int32MultiArray.h"
-
 class DirectionFinder {
 	private:
 		geometry_msgs::Vector3 *compassOrientation;
