@@ -186,5 +186,5 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(gps_ros gps_ros.cpp)
-target_link_libraries(gps_ros ${catkin_LIBRARIES})
+add_executable(fb_heading_calc fb_heading_calc.cpp)
+target_link_libraries(fb_heading_calc ${catkin_LIBRARIES})
