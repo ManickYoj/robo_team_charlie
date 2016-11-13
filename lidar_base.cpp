@@ -1,9 +1,9 @@
 #include <iostream>
+#include <stdio.h>
 
 #include "ros/ros.h"
 #include "sensor_msgs/LaserScan.h"
-#include <geometry_msgs/Twist.h>
-#include <stdio.h>
+#include "geometry_msgs/Twist.h"
 
 float min_range,min_range_angle;
 
@@ -15,13 +15,13 @@ void chatterCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 	min_range=msg->ranges[0];
 	min_range_angle=0;
 	for(int j=0;j<=360;j++) //increment by one degree
+	{
+		if(msg->ranges[j]<min_range)
 		{
-		  	if(msg->ranges[j]<min_range)
-			{
-				min_range=msg->ranges[j];
-				min_range_angle=j/2;
-			}
+			min_range=msg->ranges[j];
+			min_range_angle=j/2;
 		}
+	}
 		printf("minimum range is [%f] at an angle of [%f]\n",min_range,min_range_angle);
 	if(min_range<=1.2)  // min_range<=0.5 gave box pushing like behaviour, min_range<=1.2 gave obstacle avoidance
 	{
@@ -44,14 +44,12 @@ void chatterCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 		cmdvel.angular.z=0;
 		printf("straight\n");
 	}
-	 
-	 vel_pub.publish(cmdvel);
 
+	 vel_pub.publish(cmdvel);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char* argv[])
 {
-  
   ros::init(argc, argv, "laser_messages");
   ros::NodeHandle n;
   ros::NodeHandle nh;
@@ -62,7 +60,7 @@ int main(int argc, char **argv)
   cmdvel.linear.z=0;
   cmdvel.angular.x=0;
   cmdvel.angular.y=0;
-  cmdvel.angular.z=0; 
+  cmdvel.angular.z=0;
 
   ros::Subscriber sub = n.subscribe("base_scan", 1, chatterCallback);
 
