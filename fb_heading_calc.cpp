@@ -7,6 +7,17 @@
 #include "geometry_msgs/Vector3Stamped.h"
 #include "sensor_msgs/NavSatFix.h"
 
+const double CORRECTION_FACTOR=14.61;
+
+geometry_msgs::Vector3 trueNorth(double correctionFactor, geometry_msgs::Vector3 *currentDir){
+ 	geometry_msgs::Vector3 compassOrientation;
+ 	compassOrientation.x=currentDir->x +correctionFactor;
+ 	compassOrientation.y= currentDir->y +correctionFactor;
+ 	compassOrientation.z= currentDir->z +correctionFactor;
+ 	return compassOrientation;
+}
+
+
 class DirectionFinder {
 	private:
 		geometry_msgs::Vector3 *compassOrientation;
@@ -50,6 +61,7 @@ void DirectionFinder::recalculateHeading() {
 	if (compassOrientation == NULL) return;
 	if (gpsPosition == NULL) return;
 
+	geometry_msgs::Vector3 trueOrientation=trueNorth(CORRECTION_FACTOR, compassOrientation);
 	/*
 		TODO: Use stored data to calculate a heading from
 		the current gpsPosition to the waypoint.
