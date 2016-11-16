@@ -1,53 +1,51 @@
 #include <vector>
 #include <iostream>
 #include <stddef.h> //Defines NULL
+#include <math.h>
+#include <tf/transform_datatypes.h>
 
 #include "ros/ros.h"
 #include "geometry_msgs/Vector3.h"
-#include "geometry_msgs/Vector3Stamped.h"
+#include "geometry_msgs/Point.h"
 #include "sensor_msgs/NavSatFix.h"
+#include "sensor_msgs/Imu.h"
+#include "std_msgs/String.h"
+#include "std_msgs/Int16MultiArray.h"
 
-const double CORRECTION_FACTOR=14.61;
 
-geometry_msgs::Vector3 trueNorth(double correctionFactor, geometry_msgs::Vector3 *currentDir){
- 	geometry_msgs::Vector3 compassOrientation;
- 	compassOrientation.x=currentDir->x +correctionFactor;
- 	compassOrientation.y= currentDir->y +correctionFactor;
- 	compassOrientation.z= currentDir->z +correctionFactor;
- 	return compassOrientation;
-}
 
+// -- Constant Declarations
+const double DECLINATION = 0.2549926;
 
 class DirectionFinder {
 	private:
-		geometry_msgs::Vector3 *compassOrientation;
-		sensor_msgs::NavSatFix *gpsPosition;
-		sensor_msgs::NavSatFix *waypoint;
-		ros::NodeHandle *n;
-		ros::Publisher *output;
+		double* heading;
+		tf::Point* position;
+		tf::Point* waypoint;
+		ros::NodeHandle n;
+		ros::Publisher logging;
+		ros::Publisher output;
+		ros::Subscriber gpsSub;
+		ros::Subscriber compassSub;
+		ros::Subscriber waypointSub;
 		void recalculateHeading();
+		void chatter(std::string s);
 
 	public:
-		DirectionFinder(ros::NodeHandle &n);
+		DirectionFinder() {
+			logging = n.advertise<std_msgs::String>("/chatter", 1000);
+			output = n.advertise<std_msgs::Int16MultiArray>("/wpt/cmd_vel", 1000);
+
+
+			// Set up subscriptions to required data sources:
+		  gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
+		  compassSub = n.subscribe("/imu/data", 1000, &DirectionFinder::updateHeading, this);
+		  waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
+		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
-		void updateWaypoint(const sensor_msgs::NavSatFix &gpsPosition);
-		void updateCompass(const geometry_msgs::Vector3Stamped &compassOrientation);
+		void updateWaypoint(const sensor_msgs::NavSatFix &waypoint);
+		void updateHeading(const sensor_msgs::Imu &heading);
 };
-
-/**
-	Construct the DirectionFinder class.waypoint
-
-	@param n A NodeHandle to use as the base for publications and subscriptions
-*/
-DirectionFinder::DirectionFinder(ros::NodeHandle &n) {
-	this->n = &n;
-	ros::Publisher output = n.advertise<geometry_msgs::Vector3>("/desired_heading", 1000);
-	this->output = &output;
-
-	this->compassOrientation = NULL;
-	this->gpsPosition = NULL;
-	this->waypoint = NULL;
-}
 
 /**
 	To be invoked when any of the DirectionFinder data fields
@@ -58,13 +56,12 @@ DirectionFinder::DirectionFinder(ros::NodeHandle &n) {
 void DirectionFinder::recalculateHeading() {
 	// Return early if insufficient information available
 	if (waypoint == NULL) return;
-	if (compassOrientation == NULL) return;
-	if (gpsPosition == NULL) return;
+	if (heading == NULL) return;
+	if (position == NULL) return;
 
-	geometry_msgs::Vector3 trueOrientation=trueNorth(CORRECTION_FACTOR, compassOrientation);
 	/*
 		TODO: Use stored data to calculate a heading from
-		the current gpsPosition to the waypoint.
+		the current position to the waypoint.
 	*/
 
 	// TODO: Publish the resultant heading.
@@ -74,54 +71,82 @@ void DirectionFinder::recalculateHeading() {
 }
 
 /**
-	Updates the gpsPosition field and triggers a heading recalculation.
+	A simple function to publish a string to the chatter
+	topic for debugging purposes.
+
+	@param s The string to publish
+*/
+void DirectionFinder::chatter(std::string s) {
+	std_msgs::String msg;
+	msg.data = s;
+	ROS_INFO("%s", msg.data.c_str());
+	logging.publish(msg);
+}
+
+/**
+	Updates the position field and triggers a heading recalculation.
 
 	@param gpsPosition
 */
 void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 {
-    this->gpsPosition = (sensor_msgs::NavSatFix*) &gpsPosition;
+		// TODO: Convert GPS position (long-lat-alt) into local frame,
+		// with meters as units and the center of the O (center of crossed
+		// paths) as the origin
+
+		// (sensor_msgs::NavSatFix*) &gpsPosition;
+    // this->gpsPosition = <geometry_msgs::Vector3>
+
     this->recalculateHeading();
 }
 
 /**
-	Updates the gpsPosition field and triggers a heading recalculation.
+	Updates the waypoint field and triggers a heading recalculation.
 
 	@param waypoint
 */
 void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &waypoint)
 {
-    this->waypoint = (sensor_msgs::NavSatFix*) &waypoint;
+		// TODO: Write waypoint node and convert from GPS waypoint to local frame
+		// with meters as units and the center of the O (center of crossed paths)
+	  // as the origin
+
+    // this->waypoint = (sensor_msgs::NavSatFix*) &waypoint;
+
     this->recalculateHeading();
 }
 
 /**
-	Updates the compassOrientation field and triggers a heading recalculation.
+	Updates the heading field and triggers a heading recalculation.
 
-	@param compassOrientation
+	@param heading
 */
-void DirectionFinder::updateCompass (const geometry_msgs::Vector3Stamped &compassOrientation)
+void DirectionFinder::updateHeading (const sensor_msgs::Imu &heading)
 {
-    this->compassOrientation = (geometry_msgs::Vector3*) &(compassOrientation.vector);
+		// The fused IMU orientation data comes in as a quaternion,
+		// we convert it here to a yaw for ease of use.
+		double uncorrectedHeading = tf::getYaw(heading.orientation);
+
+		// Correct declination (difference between true north and magnetic north)
+		// and be sure to limit values from -PI to PI
+		double correctedHeading = uncorrectedHeading + DECLINATION;
+		if (correctedHeading > M_PI) correctedHeading -= M_PI*2;
+		this->heading = &correctedHeading;
+
+		// Debug output
+		std::stringstream ss;
+		ss << "Uncorrected: " << uncorrectedHeading << "\nCorrected: " << correctedHeading;
+		chatter(ss.str());
+
     this->recalculateHeading();
 }
-
 
 
 int main(int argc, char* argv[])
 {
 	// Initialize DirectionFinder
-	ros::init(argc, argv, "gps_ros");
-    ros::NodeHandle n;
-    DirectionFinder d(n);
-
-    // Set up subscriptions to required data sources:
-    // The DirectionFinder will recalculate and publish headings
-    // once all of the topics on which it is dependent have been
-    // published to.
-    ros::Subscriber subGPS = n.subscribe("fix", 1000, &DirectionFinder::updateGPS, &d);
-    ros::Subscriber subCompass = n.subscribe("imu/mag", 1000, &DirectionFinder::updateCompass, &d);
-    ros::Subscriber subWaypoint = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, &d);
-
-    ros::spin();
+	ros::init(argc, argv, "heading_calculator");
+  DirectionFinder d;
+  ros::spin();
+  return 0;
 }
