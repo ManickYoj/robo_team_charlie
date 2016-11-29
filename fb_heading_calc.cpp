@@ -23,6 +23,7 @@ class DirectionFinder {
 		tf::Point* position;
 		tf::Point* waypoint;
 		ros::NodeHandle n;
+        ros::Publisher testing;
 		ros::Publisher logging;
 		ros::Publisher output;
 		ros::Subscriber gpsSub;
@@ -30,6 +31,7 @@ class DirectionFinder {
 		ros::Subscriber waypointSub;
 		void recalculateHeading();
 		void chatter(std::string s);
+        void storeGPS();
 
 	public:
 		DirectionFinder() {
@@ -58,17 +60,33 @@ void DirectionFinder::recalculateHeading() {
 	if (waypoint == NULL) return;
 	if (heading == NULL) return;
 	if (position == NULL) return;
+    void storeGPS();
+    /*
+        TODO: Use stored data to calculate a heading from
+        the current position to the waypoint.
+    */
 
-	/*
-		TODO: Use stored data to calculate a heading from
-		the current position to the waypoint.
-	*/
+    // TODO: Publish the resultant heading.
+    // output.publish(<message>);
 
-	// TODO: Publish the resultant heading.
-	// output.publish(<message>);
-
-	return;
+    return;
 }
+
+
+void DirectionFinder::storeGPS() {
+    // Return early if insufficient information available
+    if (waypoint == NULL) return;
+    if (heading == NULL) return;
+    if (position == NULL) return;
+
+    std::vector <float> gps_storedx;
+    std::vector <float> gps_storedy;
+    std::int num_points;
+    gps_storedx.push_back(position[0]);
+    gps_storedy.push_back(position[1]);
+    num_points = gps_storedx.size();
+
+
 
 /**
 	A simple function to publish a string to the chatter

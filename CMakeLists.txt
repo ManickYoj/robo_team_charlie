@@ -188,3 +188,5 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(fb_heading_calc fb_heading_calc.cpp)
 target_link_libraries(fb_heading_calc ${catkin_LIBRARIES})
+add_executable(local_coords local_coords.cpp)
+target_link_libraries(local_coords ${catkin_LIBRARIES})
