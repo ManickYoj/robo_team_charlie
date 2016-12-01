@@ -70,6 +70,21 @@ void DirectionFinder::recalculateHeading() {
 	return;
 }
 
+void DirectionFinder::calculateAngle(){
+	// Return early if insufficient information available
+	if (waypoint == NULL) return;
+	if (heading == NULL) return;
+	if (position == NULL) return;
+
+	//calculate waypoint direction vector
+	std::vector3 waypointDirection.x= waypoint.x-position.x;
+	waypointDirection.y=waypoint.y-position.y;
+
+	//applying the cosine equation to find the angle between the two vectors (there might be an easier way to do this with vector math though, not sure???)
+	double angle=acos(((waypointDirection.x*heading.x)+(waypointDirection.y*heading.y))/(abs(waypointDirection.x*heading.x)+abs(waypointDirection.y*heading.y)));
+	return angle;
+}
+
 /**
 	A simple function to publish a string to the chatter
 	topic for debugging purposes.
