@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     double current_lat = 42.29363775;
     double current_long = -71.2638475;
     tf::Point local_xyz= local_coords(current_long, current_lat);
-    std::cout << local_xyz.x();
+    std::cout << local_xyz.x() << "\n";
     std::cout << local_xyz.y();
     return 0;
 }
