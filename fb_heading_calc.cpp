@@ -70,7 +70,7 @@ void DirectionFinder::recalculateHeading() {
 	return;
 }
 
-void DirectionFinder::calculateAngle(){
+double DirectionFinder::calculateAngle(){
 	// Return early if insufficient information available
 	if (waypoint == NULL) return;
 	if (heading == NULL) return;
