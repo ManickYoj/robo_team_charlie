@@ -16,8 +16,8 @@
 
 // -- Constant Declarations
 const double DECLINATION = 0.2549926;
-const double LINEAR_MAX = 10;
-const double ANGULAR_MAX = 10;
+const double LINEAR_MAX = 60;
+const double ANGULAR_MAX = 100;
 
 double boundAngle(double angle) {
 	if (angle > M_PI) angle -= M_PI*2;
