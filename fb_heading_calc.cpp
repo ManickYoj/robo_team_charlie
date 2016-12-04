@@ -44,7 +44,7 @@ class DirectionFinder {
 		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
 		void updateWaypoint(const sensor_msgs::NavSatFix &waypoint);
-		void updateHeading(const sensor_msgs::Imu &heading);
+		void updateHeading(const geometry_msgs::Vector3Stamped &heading);
 };
 
 /**
