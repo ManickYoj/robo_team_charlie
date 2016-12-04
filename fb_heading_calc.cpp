@@ -39,7 +39,7 @@ class DirectionFinder {
 
 			// Set up subscriptions to required data sources:
 		  gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
-		  compassSub = n.subscribe("/imu/data", 1000, &DirectionFinder::updateHeading, this);
+		  compassSub = n.subscribe("/imu/mag", 1000, &DirectionFinder::updateHeading, this);
 		  waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
 		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
@@ -121,11 +121,11 @@ void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &waypoint)
 
 	@param heading
 */
-void DirectionFinder::updateHeading (const sensor_msgs::Imu &heading)
+void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &heading)
 {
 		// The fused IMU orientation data comes in as a quaternion,
 		// we convert it here to a yaw for ease of use.
-		double uncorrectedHeading = tf::getYaw(heading.orientation);
+		double uncorrectedHeading = heading.vector.z;
 
 		// Correct declination (difference between true north and magnetic north)
 		// and be sure to limit values from -PI to PI
