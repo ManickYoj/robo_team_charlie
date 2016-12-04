@@ -38,7 +38,6 @@ class DirectionFinder {
 		tf::Point* position;
 		tf::Point* waypoint;
 		ros::NodeHandle n;
-        ros::Publisher testing;
 		ros::Publisher logging;
 		ros::Publisher output;
 		ros::Subscriber gpsSub;
