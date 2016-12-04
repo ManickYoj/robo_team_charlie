@@ -29,6 +29,7 @@ class DirectionFinder {
 		ros::Subscriber compassSub;
 		ros::Subscriber waypointSub;
 		void recalculateHeading();
+		double calculateAngle();
 		void chatter(std::string s);
 
 	public:

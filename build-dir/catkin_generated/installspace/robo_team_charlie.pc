@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: robo_team_charlie
+Description: Description of robo_team_charlie
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 
