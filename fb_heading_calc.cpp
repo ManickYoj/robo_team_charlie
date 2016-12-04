@@ -123,9 +123,9 @@ void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &waypoint)
 */
 void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &heading)
 {
-		// The fused IMU orientation data comes in as a quaternion,
-		// we convert it here to a yaw for ease of use.
-		double uncorrectedHeading = heading.vector.z;
+		// x seems to 0 out when pointed west, which accords with when the IMU's front
+		// is pointed to magnetic north
+		double uncorrectedHeading = heading.vector.x;
 
 		// Correct declination (difference between true north and magnetic north)
 		// and be sure to limit values from -PI to PI
@@ -135,7 +135,7 @@ void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &headin
 
 		// Debug output
 		std::stringstream ss;
-		ss << "Uncorrected: " << uncorrectedHeading << "\nCorrected: " << correctedHeading;
+		ss << "Heading from Magnetic North: " << uncorrectedHeading << "\nHeading from True North: " << heading.vector.y;
 		chatter(ss.str());
 
     this->recalculateHeading();
