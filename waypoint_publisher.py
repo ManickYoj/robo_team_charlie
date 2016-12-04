@@ -1,4 +1,20 @@
 #!/usr/bin/env python
+'''
+waypoint_publisher.py
+---------------------
+
+The purpose of this node is to read a course out
+waypoint-by-waypoint and publish each to the
+`/waypoint` topic. When the robot gets sufficiently
+close to a waypoint (as read from the GPS), it will
+publish the next waypoint to `/waypoint`.
+
+Note: currently, the robot will never quite 'finish'
+the course, but rather it will continue to try to get
+to the waypoint.
+
+'''
+
 import rospy
 import json
 import os
