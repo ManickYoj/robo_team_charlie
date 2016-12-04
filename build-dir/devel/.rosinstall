@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/kimber/catkin_ws/src/RoboTeamCharlie/build-dir/devel/setup.sh

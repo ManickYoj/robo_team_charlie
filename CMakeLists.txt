@@ -188,3 +188,10 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(fb_heading_calc fb_heading_calc.cpp)
 target_link_libraries(fb_heading_calc ${catkin_LIBRARIES})
+
+###########OPEN CV SHTUFFS###############
+cmake_minimum_required(VERSION 2.8)
+project( detectSquares )
+find_package( OpenCV REQUIRED )
+add_executable( detectSquares detectSquares.cpp )
+target_link_libraries( detectSquares ${catkin_LIBRARIES} ${OpenCV_LIBS} )
