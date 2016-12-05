@@ -18,6 +18,10 @@
 const double DECLINATION = 0.2549926;
 const double LINEAR_MAX = 60;
 const double ANGULAR_MAX = 100;
+const double ORIGIN_LAT = 42.29335375;
+const double ORIGIN_LONG = -71.26358725;
+const double LAT_TO_M = 111078.95354277734;
+const double LONG_TO_M = 82469.1107701757;
 
 double boundAngle(double angle) {
 	if (angle > M_PI) angle -= M_PI*2;
@@ -27,6 +31,16 @@ double boundAngle(double angle) {
 
 double scale(double input, double input_range, double max) {
 	return (input/input_range) * max;
+}
+
+tf::Point toLocalCoords(double longitude, double latitude) {
+    double latDiff = ORIGIN_LAT - latitude;
+    double longDiff = ORIGIN_LONG - longitude;
+
+    double x_meters = longDiff * LONG_TO_M;
+    double y_meters = latDiff * LAT_TO_M ;
+
+    return tf::Point(x_meters, y_meters, 0);
 }
 
 class DirectionFinder {
@@ -51,12 +65,12 @@ class DirectionFinder {
 
 			// Set up subscriptions to required data sources:
 		  gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
-		  compassSub = n.subscribe("/imu/data", 1000, &DirectionFinder::updateHeading, this);
+		  compassSub = n.subscribe("/imu/mag", 1000, &DirectionFinder::updateHeading, this);
 		  waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
 		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
 		void updateWaypoint(const sensor_msgs::NavSatFix &waypoint);
-		void updateHeading(const sensor_msgs::Imu &heading);
+		void updateHeading(const geometry_msgs::Vector3Stamped &heading);
 };
 
 /**
@@ -70,6 +84,10 @@ void DirectionFinder::recalculateHeading() {
 	if (waypoint == NULL) return;
 	if (heading == NULL) return;
 	if (position == NULL) return;
+  /*
+      TODO: Use stored data to calculate a heading from
+      the current position to the waypoint.
+  */
 
 	// Calculate waypoint direction vector
 	double deltaX = waypoint->getX()-position->getX();
@@ -122,12 +140,17 @@ void DirectionFinder::chatter(std::string s) {
 */
 void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 {
-		// TODO: Convert GPS position (long-lat-alt) into local frame,
-		// with meters as units and the center of the O (center of crossed
-		// paths) as the origin
+		// Convert GPS position (long-lat) into local frame
 
-		// (sensor_msgs::NavSatFix*) &gpsPosition;
-    // this->gpsPosition = <geometry_msgs::Vector3>
+		double latitude = (double) gpsPosition.latitude;
+		double longitude= (double) gpsPosition.longitude;
+		tf::Point temp = toLocalCoords(latitude, longitude);
+		this->position = &temp;
+
+		// Debug Output
+		std::stringstream ss;
+		ss << "Updated Position: (" << temp.getX() << ", " << temp.getY() << ")";
+		chatter(ss.str());
 
     this->recalculateHeading();
 }
@@ -137,13 +160,18 @@ void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 
 	@param waypoint
 */
-void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &waypoint)
+void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &gpsWaypoint)
 {
-		// TODO: Write waypoint node and convert from GPS waypoint to local frame
-		// with meters as units and the center of the O (center of crossed paths)
-	  // as the origin
+		// Convert GPS waypoint to local frame
+		double latitude = (double) gpsWaypoint.latitude;
+		double longitude= (double) gpsWaypoint.longitude;
+		tf::Point temp = toLocalCoords(latitude, longitude);
+		this->waypoint = &temp;
 
-    // this->waypoint = (sensor_msgs::NavSatFix*) &waypoint;
+		// Debug Output
+		std::stringstream ss;
+		ss << "Updated Waypoint: (" << temp.getX() << ", " << temp.getY() << ")";
+		chatter(ss.str());
 
     this->recalculateHeading();
 }
@@ -153,11 +181,11 @@ void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &waypoint)
 
 	@param heading
 */
-void DirectionFinder::updateHeading (const sensor_msgs::Imu &heading)
+void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &heading)
 {
-		// The fused IMU orientation data comes in as a quaternion,
-		// we convert it here to a yaw for ease of use.
-		double uncorrectedHeading = tf::getYaw(heading.orientation);
+		// x seems to 0 out when pointed west, which accords with when the IMU's front
+		// is pointed to magnetic north
+		double uncorrectedHeading = heading.vector.x;
 
 		// Correct declination (difference between true north and magnetic north)
 		// and be sure to limit values from -PI to PI
@@ -166,7 +194,7 @@ void DirectionFinder::updateHeading (const sensor_msgs::Imu &heading)
 
 		// Debug output
 		std::stringstream ss;
-		ss << "Uncorrected: " << uncorrectedHeading << "\nCorrected: " << correctedHeading;
+		ss << "Heading from Magnetic North: " << uncorrectedHeading << "\nHeading from True North: " << heading.vector.y;
 		chatter(ss.str());
 
     this->recalculateHeading();
