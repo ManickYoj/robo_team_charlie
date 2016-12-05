@@ -16,6 +16,21 @@
 
 // -- Constant Declarations
 const double DECLINATION = 0.2549926;
+const double ORIGIN_LAT = 42.29335375;
+const double ORIGIN_LONG = -71.26358725;
+const double LAT_TO_M = 111078.95354277734;
+const double LONG_TO_M = 82469.1107701757;
+
+
+tf::Point toLocalCoords(double longitude, double latitude) {
+    double latDiff = ORIGIN_LAT - latitude;
+    double longDiff = ORIGIN_LONG - longitude;
+
+    double x_meters = longDiff * LONG_TO_M;
+    double y_meters = latDiff * LAT_TO_M ;
+
+    return tf::Point(x_meters, y_meters, 0);
+}
 
 class DirectionFinder {
 	private:
@@ -58,16 +73,15 @@ void DirectionFinder::recalculateHeading() {
 	if (waypoint == NULL) return;
 	if (heading == NULL) return;
 	if (position == NULL) return;
+  /*
+      TODO: Use stored data to calculate a heading from
+      the current position to the waypoint.
+  */
 
-	/*
-		TODO: Use stored data to calculate a heading from
-		the current position to the waypoint.
-	*/
+  // TODO: Publish the resultant heading.
+  // output.publish(<message>);
 
-	// TODO: Publish the resultant heading.
-	// output.publish(<message>);
-
-	return;
+  return;
 }
 
 /**
@@ -90,12 +104,17 @@ void DirectionFinder::chatter(std::string s) {
 */
 void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 {
-		// TODO: Convert GPS position (long-lat-alt) into local frame,
-		// with meters as units and the center of the O (center of crossed
-		// paths) as the origin
+		// Convert GPS position (long-lat) into local frame
 
-		// (sensor_msgs::NavSatFix*) &gpsPosition;
-    // this->gpsPosition = <geometry_msgs::Vector3>
+		double latitude = (double) gpsPosition.latitude;
+		double longitude= (double) gpsPosition.longitude;
+		tf::Point temp = toLocalCoords(latitude, longitude);
+		this->position = &temp;
+
+		// Debug Output
+		std::stringstream ss;
+		ss << "Updated Position: (" << temp.getX() << ", " << temp.getY() << ")";
+		chatter(ss.str());
 
     this->recalculateHeading();
 }
@@ -105,13 +124,18 @@ void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 
 	@param waypoint
 */
-void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &waypoint)
+void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &gpsWaypoint)
 {
-		// TODO: Write waypoint node and convert from GPS waypoint to local frame
-		// with meters as units and the center of the O (center of crossed paths)
-	  // as the origin
+		// Convert GPS waypoint to local frame
+		double latitude = (double) gpsWaypoint.latitude;
+		double longitude= (double) gpsWaypoint.longitude;
+		tf::Point temp = toLocalCoords(latitude, longitude);
+		this->waypoint = &temp;
 
-    // this->waypoint = (sensor_msgs::NavSatFix*) &waypoint;
+		// Debug Output
+		std::stringstream ss;
+		ss << "Updated Waypoint: (" << temp.getX() << ", " << temp.getY() << ")";
+		chatter(ss.str());
 
     this->recalculateHeading();
 }
