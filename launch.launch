@@ -1,9 +1,10 @@
 
 <launch>
+  <node name="serial_node" pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM0"/>
+  <node name="gps" pkg="nmea_navsat_driver" type="nmea_serial_driver" args="_baud:=115200 _port:=/dev/ttyACM1" />
   <node name="imu" pkg="phidgets_imu" type="phidgets_imu_node" />
-  <!-- <node name="imu_processor" pkg="imu_filter_madgwick" type="imu_filter_node" /> -->
-  <node name="forebrain_heading_calculator" pkg="robo_team_charlie" type="fb_heading_calc" />
-  <node name="gps" pkg="nmea_navsat_driver" type="nmea_serial_driver" args="_baud:=115200 _port:=/dev/ttyACM0" />
-  <node name="midbrain" pkg="robo_team_charlie" type="mid_brain" />
   <node name="lidar" pkg="hokuyo_node" type="hokuyo_node" />
+  <node name="forebrain_heading_calculator" pkg="robo_team_charlie" type="fb_heading_calc" />
+  <node name="midbrain" pkg="robo_team_charlie" type="mid_brain" />
+  <!-- <node name="imu_processor" pkg="imu_filter_madgwick" type="imu_filter_node" /> -->
 </launch>
