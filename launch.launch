@@ -11,6 +11,6 @@
   <node name="imu" pkg="phidgets_imu" type="phidgets_imu_node" />
   <!-- <node name="imu_processor" pkg="imu_filter_madgwick" type="imu_filter_node" /> -->
   <node name="forebrain" pkg="robo_team_charlie" type="fb_heading_calc" />
-  <node name="mdf_reader" pkg="robo_team_charlie" type="waypoint_publisher.py" />
+  <!-- <node name="mdf_reader" pkg="robo_team_charlie" type="waypoint_publisher.py" /> -->
   <node name="midbrain" pkg="robo_team_charlie" type="mid_brain" />
 </launch>
