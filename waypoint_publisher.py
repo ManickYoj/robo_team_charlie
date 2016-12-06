@@ -23,8 +23,8 @@ from sensor_msgs.msg import NavSatFix
 
 # -- Config
 COURSE = 'SAFE'
+COURSEFILE = '~/catkin_ws/src/robo_team_charlie/courses.json'
 print (os.listdir('.'))
-COURSEFILE = 'courses.json'
 WAYPOINT_RADIUS = 2; # Waypoint radius in meters
 DEBUG = True
 
