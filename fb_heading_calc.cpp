@@ -11,6 +11,7 @@
 #include "sensor_msgs/Imu.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Int8MultiArray.h"
+#include "std_msgs/Float64MultiArray.h"
 
 
 
@@ -69,7 +70,7 @@ class DirectionFinder {
 		  waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
 		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
-		void updateWaypoint(const sensor_msgs::NavSatFix &waypoint);
+		void updateWaypoint(const std_msgs::Float64MultiArray &waypoint);
 		void updateHeading(const geometry_msgs::Vector3Stamped &heading);
 };
 
@@ -160,11 +161,11 @@ void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 
 	@param waypoint
 */
-void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &gpsWaypoint)
+void DirectionFinder::updateWaypoint (const std_msgs::Float64MultiArray &gpsWaypoint)
 {
 		// Convert GPS waypoint to local frame
-		double latitude = (double) gpsWaypoint.latitude;
-		double longitude= (double) gpsWaypoint.longitude;
+		double latitude = (double) gpsWaypoint.data[0];
+		double longitude= (double) gpsWaypoint.data[1];
 		tf::Point temp = toLocalCoords(latitude, longitude);
 		this->waypoint = &temp;
 
