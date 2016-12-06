@@ -36,6 +36,11 @@ class WptPublisher:
 		with open(COURSEFILE, 'r') as coursefile:
 			self.courses = json.load(coursefile);
 
+		rospy.init_node(
+			'waypoint_publisher',
+			anonymous=True
+		)
+
 		self.pub = rospy.Publisher(
 			'/waypoint',
 			Float64MultiArray,
@@ -51,10 +56,6 @@ class WptPublisher:
 
 
 		self.setCourse(coursename)
-		rospy.init_node(
-			'waypoint_publisher',
-			anonymous=True
-		)
 
 		self.sub = rospy.Subscriber(
 			'/fix',
