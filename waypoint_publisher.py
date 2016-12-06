@@ -49,18 +49,18 @@ class WptPublisher:
 				queue_size=10
 			)
 
-		self.sub = rospy.Subscriber(
-			'/fix',
-			NavSatFix,
-			self.checkDistance
-		)
 
+		self.setCourse(coursename)
 		rospy.init_node(
 			'waypoint_publisher',
 			anonymous=True
 		)
 
-		self.setCourse(coursename)
+		self.sub = rospy.Subscriber(
+			'/fix',
+			NavSatFix,
+			self.checkDistance
+		)
 
 		rate = rospy.Rate(10)
 		while not rospy.is_shutdown():
