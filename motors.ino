@@ -5,7 +5,7 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/Twist.h>
-#include <std_msgs/Int16.h>
+  #include <std_msgs/Int16.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int32.h>
@@ -63,24 +63,21 @@ void cb(const geometry_msgs::Twist& twist_msg){
 	//convert msg (in linear and angular components) into left and right motor speeds
   velocity = (int) twist_msg.linear.x;
   //velocity = map(velocity,-60,60,-100,100);
+  leftMotorSpeed= velocity;
+  rightMotorSpeed = velocity;
   
-  new_velocity = map(velocity,-100,100,140,30);
-  
-  leftMotorSpeed = new_velocity;
-  rightMotorSpeed = new_velocity;
-  
+
   
   angular = (int) twist_msg.angular.z;
   //angular = map(angular,-100,100,-1,1);
+ 
+    
   
   if (angular < 0){
-    turnRight = false;
-    turnLeft = true;
-    straight = false;
-    
+    //negative angle = turn left
     leftMotorSpeed = velocity + angular;
-    rightMotorSpeed = velocity - angular;
-    
+    rightMotorSpeed = velocity;
+
     if (leftMotorSpeed>100){
       leftMotorSpeed == 100;
     }
@@ -94,15 +91,11 @@ void cb(const geometry_msgs::Twist& twist_msg){
       rightMotorSpeed == -100;
     }
     
-    leftMotorSpeed = map(leftMotorSpeed,-100,100,140,30);
-    rightMotorSpeed = map(rightMotorSpeed,-100,100,140,30);
+
   }
   if (angular > 0){
-    turnRight = true;
-    turnLeft = false;
-    straight = false;
-    
-    leftMotorSpeed = velocity + angular;
+    //positive angle = turn right
+    leftMotorSpeed = velocity;
     rightMotorSpeed = velocity - angular;
 
     if (leftMotorSpeed>100){
@@ -118,9 +111,11 @@ void cb(const geometry_msgs::Twist& twist_msg){
       rightMotorSpeed == -100;
     }
     
-    leftMotorSpeed = map(leftMotorSpeed,-100,100,140,30);
-    rightMotorSpeed = map(rightMotorSpeed,-100,100,140,30);
   }
+  
+  leftMotorSpeed = map(leftMotorSpeed,-100,100,140,30);
+  rightMotorSpeed = map(rightMotorSpeed,-100,100,140,30);
+  
 }
 
 ros::NodeHandle  nh;
@@ -212,14 +207,14 @@ void loop() {
   
   //if there's no ground set motor speeds to zero
   if (leftIR_range > 50.0 || rightIR_range > 50.0){
-    leftMotor.write(85);
-    rightMotor.write(85);
+    leftMotorSpeed = 0;
+    rightMotorSpeed = 0;
   }
-  else{
+ 
     //write the motor speeds to the motor
     leftMotor.write(leftMotorSpeed);
     rightMotor.write(rightMotorSpeed); 
-  }
+ 
   
   //set the data to be published
   ir.data[0] = leftIR_range;
