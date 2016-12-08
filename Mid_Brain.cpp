@@ -14,12 +14,18 @@
 ros::Publisher *pub_arb;
 sensor_msgs::LaserScan scan;
 std_msgs::Int8MultiArray cmd_array;
+
+ros::Publisher *avoidanceFlag;    //for publishing the flag-- whether or not obstacle avoidance is happening
+std_msgs::Boolean flag;
+
 int backward[22] = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int stop[22] =     {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int forward[22] =  {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+Int8 flag=0;
 
 void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
 {
@@ -44,16 +50,19 @@ void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
   if (forward_distance < .5)
   {
     // Move backward
+    flag=1; //avoiding obstacles
     cmd_array.data.assign(&backward[0], &backward[0]+22);
   }
   else if (forward_distance < 1)
   {
     // Stop
+    flag=1; //avoiding obstacles
     cmd_array.data.assign(&stop[0], &stop[0]+22);
   }
   else
   {
     // Move forward
+    flag=0; //not avoiding obstacles
     cmd_array.data.assign(&forward[0], &forward[0]+22);
   }
 
@@ -74,10 +83,12 @@ int main(int argc, char **argv)
   cmd_array.data.assign(&stop[0], &stop[0]+22);
 
   ros::init(argc, argv, "midbrain");
+  ros::init(argc, argv, "avoidanceFlag");
 
   ros::NodeHandle n;
 
   ros::Subscriber sub_imu = n.subscribe("/scan", 1000, controlSpeed);
+  ros::Publisher flag_pub = n.advertise<std_msgs::Int8>(flag, 1000); //publishing the flag
 
   pub_arb = new ros::Publisher(n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000));
 
