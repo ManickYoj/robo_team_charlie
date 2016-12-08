@@ -34,13 +34,13 @@ double scale(double input, double input_range, double max) {
 }
 
 tf::Point toLocalCoords(double longitude, double latitude) {
-    double latDiff = ORIGIN_LAT - latitude;
-    double longDiff = ORIGIN_LONG - longitude;
+		double latDiff = ORIGIN_LAT - latitude;
+		double longDiff = ORIGIN_LONG - longitude;
 
-    double x_meters = longDiff * LONG_TO_M;
-    double y_meters = latDiff * LAT_TO_M ;
+		double x_meters = longDiff * LONG_TO_M;
+		double y_meters = latDiff * LAT_TO_M ;
 
-    return tf::Point(x_meters, y_meters, 0);
+		return tf::Point(x_meters, y_meters, 0);
 }
 
 class DirectionFinder {
@@ -64,9 +64,9 @@ class DirectionFinder {
 
 
 			// Set up subscriptions to required data sources:
-		  gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
-		  compassSub = n.subscribe("/imu/mag", 1000, &DirectionFinder::updateHeading, this);
-		  waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
+			gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
+			compassSub = n.subscribe("/imu/mag", 1000, &DirectionFinder::updateHeading, this);
+			waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
 		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
 		void updateWaypoint(const sensor_msgs::NavSatFix &waypoint);
@@ -84,10 +84,10 @@ void DirectionFinder::recalculateHeading() {
 	if (waypoint == NULL) return;
 	if (heading == NULL) return;
 	if (position == NULL) return;
-  /*
-      TODO: Use stored data to calculate a heading from
-      the current position to the waypoint.
-  */
+	/*
+			TODO: Use stored data to calculate a heading from
+			the current position to the waypoint.
+	*/
 
 	// Calculate waypoint direction vector
 	double deltaX = waypoint->getX()-position->getX();
@@ -152,7 +152,7 @@ void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 		ss << "Updated Position: (" << temp.getX() << ", " << temp.getY() << ")";
 		chatter(ss.str());
 
-    this->recalculateHeading();
+		this->recalculateHeading();
 }
 
 /**
@@ -173,7 +173,7 @@ void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &gpsWaypoint)
 		ss << "Updated Waypoint: (" << temp.getX() << ", " << temp.getY() << ")";
 		chatter(ss.str());
 
-    this->recalculateHeading();
+		this->recalculateHeading();
 }
 
 /**
@@ -197,7 +197,7 @@ void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &headin
 		ss << "Heading from Magnetic North: " << uncorrectedHeading << "\nHeading from True North: " << heading.vector.y;
 		chatter(ss.str());
 
-    this->recalculateHeading();
+		this->recalculateHeading();
 }
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import Int8MultiArray
+from std_msgs.msg import Int8MultiArray, Int8
 from geometry_msgs.msg import Twist
 import numpy as np
 
@@ -17,21 +17,27 @@ class Midbrain_Arbiter(object):
 
 		rospy.Subscriber('/wpt/cmd_vel', Int8MultiArray, self.wpt_cmd_vel_cb)
 		rospy.Subscriber('/obst/cmd_vel', Int8MultiArray, self.obst_cmd_vel_cb)
-		rospy.Subscriber('/obst/avoid', Int8, self.flag) #whether or not we are avoiding an obstacle!
+		rospy.Subscriber('/obst/avoid', Int8, self.update_flag) #whether or not we are avoiding an obstacle!
 
 		self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+
+	def update_flag(self, value):
+		self.flag = value.data
 
 	def wpt_cmd_vel_cb(self, msg):
 		if(self.flag==0): #not object avoidance
 			self.update_array(msg.data, INPUTS.index('wpt'))
 		else: #in the event of object avoidance
 			pass
+
 	def obst_cmd_vel_cb(self, msg, flag):
 		self.update_array(msg.data, INPUTS.index('obst'))
+
 	def update_array(self, data, row):
 		data = np.asarray(data).reshape([2, ARRAY_SIZE])
 		self.vel_array[row] = data[0]
 		self.turn_array[row] = data[1]
+
 	def run(self):
 		vel_sum_array = np.zeros(ARRAY_SIZE)
 		turn_sum_array = np.zeros(ARRAY_SIZE)
