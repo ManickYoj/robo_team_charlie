@@ -66,9 +66,9 @@ class Courses:
 if __name__ == "__main__":
 	c = Courses()
 
-	# safe_single = ['s0' + str(digit) for digit in range(0,10)]
-	# safe_double = ['s' + str(digit) for digit in range(10,30)]
-	# c.delete('ABCDE');
-	# c.add('ABCDE', ['wptA', 'wptB', 'wptC', 'wptD', 'wptE'])
+	gps_single = ['gps0' + str(digit) for digit in range(1,10)]
+	gps_double = ['gps' + str(digit) for digit in range(10,31)]
+	#c.delete('Google');
+	c.add('Google', gps_single + gps_double)
 
 	c.listcourses()
