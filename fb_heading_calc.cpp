@@ -46,9 +46,12 @@ tf::Point toLocalCoords(double longitude, double latitude) {
 
 class DirectionFinder {
 	private:
-		double* heading;
-		tf::Point* position;
-		tf::Point* waypoint;
+		double heading;
+		tf::Point position;
+		tf::Point waypoint;
+		bool headingAvailable;
+		bool positionAvailable;
+		bool waypointAvailable;
 		ros::NodeHandle n;
 		ros::Publisher logging;
 		ros::Publisher output;
@@ -60,9 +63,12 @@ class DirectionFinder {
 
 	public:
 		DirectionFinder() {
+			headingAvailable = false;
+			positionAvailable = false;
+			waypointAvailable = false;
+
 			logging = n.advertise<std_msgs::String>("/chatter", 1000);
 			output = n.advertise<std_msgs::Int8MultiArray>("/wpt/cmd_vel", 1000);
-
 
 			// Set up subscriptions to required data sources:
 			gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
@@ -82,20 +88,13 @@ class DirectionFinder {
 */
 void DirectionFinder::recalculateHeading() {
 	// Return early if insufficient information available
-	if (waypoint == NULL) return;
-	if (heading == NULL) return;
-	if (position == NULL) return;
-
-	std::stringstream ss;
-	ss << "Null tests passed.";
-	chatter(ss.str());
+	if (!waypointAvailable) return;
+	if (!headingAvailable) return;
+	if (!positionAvailable) return;
 
 	// Calculate waypoint direction vector
-	double deltaX = waypoint->getX()-position->getX();
-	double deltaY = waypoint->getY()-position->getY();
-
-	ss << "Deltas: (" << deltaX << ", " << deltaY << ")\n";
-	chatter(ss.str());
+	double deltaX = waypoint.getX()-position.getX();
+	double deltaY = waypoint.getY()-position.getY();
 
 	// Angle between heading to waypoint and true North
 	// Left is positive, right is negative
@@ -103,15 +102,12 @@ void DirectionFinder::recalculateHeading() {
 	if (deltaY == 0 && deltaX == 0) return;
 	double desiredHeading = boundAngle(atan2(deltaY, deltaX) - M_PI /2);
 
-	ss << "Desired Heading: (" << desiredHeading << ")\n";
-	chatter(ss.str());
-
 	// Difference between current heading and heading to waypoint
 	// Ideally 0
-	double currentHeading = (double) *heading;
-	double headingChange = boundAngle(desiredHeading - currentHeading);
+	double headingChange = boundAngle(desiredHeading - heading);
 
 	// Test output of angle to waypoint
+	std::stringstream ss;
 	ss << "Desired heading change: " << headingChange;
 	chatter(ss.str());
 
@@ -146,16 +142,16 @@ void DirectionFinder::chatter(std::string s) {
 */
 void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 {
-		// Convert GPS position (long-lat) into local frame
+		positionAvailable = true;
 
+		// Convert GPS position (long-lat) into local frame
 		double latitude = (double) gpsPosition.latitude;
 		double longitude= (double) gpsPosition.longitude;
-		tf::Point temp = toLocalCoords(latitude, longitude);
-		this->position = &temp;
+		this->position = toLocalCoords(latitude, longitude);
 
 		// Debug Output
 		std::stringstream ss;
-		ss << "Updated Position: (" << temp.getX() << ", " << temp.getY() << ")";
+		ss << "Updated Position: (" << this->position.getX() << ", " << this->position.getY() << ")";
 		chatter(ss.str());
 
 		this->recalculateHeading();
@@ -168,15 +164,16 @@ void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 */
 void DirectionFinder::updateWaypoint (const std_msgs::Float64MultiArray &gpsWaypoint)
 {
+		waypointAvailable = true;
+
 		// Convert GPS waypoint to local frame
 		double latitude = (double) gpsWaypoint.data[0];
 		double longitude= (double) gpsWaypoint.data[1];
-		tf::Point temp = toLocalCoords(latitude, longitude);
-		this->waypoint = &temp;
+		this->waypoint = toLocalCoords(latitude, longitude);
 
 		// Debug Output
 		std::stringstream ss;
-		ss << "Updated Waypoint: (" << temp.getX() << ", " << temp.getY() << ")";
+		ss << "Updated Waypoint: (" << this->waypoint.getX() << ", " << this->waypoint.getY() << ")";
 		chatter(ss.str());
 
 		this->recalculateHeading();
@@ -189,14 +186,15 @@ void DirectionFinder::updateWaypoint (const std_msgs::Float64MultiArray &gpsWayp
 */
 void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &heading)
 {
+		headingAvailable = true;
+
 		// x seems to 0 out when pointed west, which accords with when the IMU's front
 		// is pointed to magnetic north
 		double uncorrectedHeading = heading.vector.x;
 
 		// Correct declination (difference between true north and magnetic north)
 		// and be sure to limit values from -PI to PI
-		double correctedHeading = boundAngle(uncorrectedHeading + DECLINATION);
-		this->heading = &correctedHeading;
+		this->heading = boundAngle(uncorrectedHeading + DECLINATION);
 
 		// Debug output
 		std::stringstream ss;
