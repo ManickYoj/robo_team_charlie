@@ -66,9 +66,9 @@ class Courses:
 if __name__ == "__main__":
 	c = Courses()
 
-	gps_single = ['gps0' + str(digit) for digit in range(1,10)]
-	gps_double = ['gps' + str(digit) for digit in range(10,31)]
+	#gps_single = ['gps0' + str(digit) for digit in range(1,10)]
+	#gps_double = ['gps' + str(digit) for digit in range(10,31)]
 	#c.delete('Google');
-	c.add('Google', gps_single + gps_double)
+	c.add('Google Waypoints', ['g_wptA', 'g_wptB', 'g_wptC', 'g_wptD', 'g_wptE'])
 
 	c.listcourses()
