@@ -34,7 +34,7 @@ class Midbrain_Arbiter(object):
 		else: #in the event of object avoidance
 			pass
 
-	def obst_cmd_vel_cb(self, msg, flag):
+	def obst_cmd_vel_cb(self, msg):
 		self.update_array(msg.data, INPUTS.index('obst'))
 
 	def update_array(self, data, row):
