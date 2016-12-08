@@ -56,8 +56,8 @@ class Midbrain_Arbiter(object):
 		vel = vel_sum_array.argmax()
 		turn = turn_sum_array.argmax()
 		msg = Twist()
-		msg.linear.x = 2*vel/(ARRAY_SIZE-1)-1
-		msg.angular.z = 2*turn/(ARRAY_SIZE-1)-1
+		msg.linear.x = 200*vel/(ARRAY_SIZE-1)-100
+		msg.angular.z = 200*turn/(ARRAY_SIZE-1)-100
 		self.cmd_vel_pub.publish(msg)
 
 if __name__ == '__main__':
