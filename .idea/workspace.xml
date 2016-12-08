@@ -32,7 +32,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="be73c9b9-1b28-432c-b2c9-7c0a86e57e9e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mid-arbiter.py" afterPath="$PROJECT_DIR$/mid-arbiter.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fb_heading_calc.cpp" afterPath="$PROJECT_DIR$/fb_heading_calc.cpp" />
     </list>
     <ignored path="robo_team_charlie.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -53,11 +53,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="fb_heading_calc.cpp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="fb_heading_calc.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/fb_heading_calc.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2988">
-              <caret line="185" column="71" selection-start-line="185" selection-start-column="67" selection-end-line="185" selection-end-column="71" />
+            <state relative-caret-position="486">
+              <caret line="109" column="38" selection-start-line="109" selection-start-column="38" selection-end-line="109" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -73,11 +73,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mid-arbiter.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mid-arbiter.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mid-arbiter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="36" column="33" selection-start-line="36" selection-start-column="33" selection-end-line="36" selection-end-column="33" />
+            <state relative-caret-position="-493">
+              <caret line="14" column="60" selection-start-line="14" selection-start-column="60" selection-end-line="14" selection-end-column="60" />
               <folding>
                 <element signature="e#23#35#0" expanded="true" />
               </folding>
@@ -130,8 +130,8 @@
         <option value="$PROJECT_DIR$/coneFindingCamera.py" />
         <option value="$PROJECT_DIR$/Mid_Brain.cpp" />
         <option value="$PROJECT_DIR$/launch.launch" />
-        <option value="$PROJECT_DIR$/fb_heading_calc.cpp" />
         <option value="$PROJECT_DIR$/mid-arbiter.py" />
+        <option value="$PROJECT_DIR$/fb_heading_calc.cpp" />
       </list>
     </option>
   </component>
@@ -631,21 +631,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fb_heading_calc.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2988">
-          <caret line="185" column="71" selection-start-line="185" selection-start-column="67" selection-end-line="185" selection-end-column="71" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mid-arbiter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="36" column="33" selection-start-line="36" selection-start-column="33" selection-end-line="36" selection-end-column="33" />
+        <state relative-caret-position="-493">
+          <caret line="14" column="60" selection-start-line="14" selection-start-column="60" selection-end-line="14" selection-end-column="60" />
           <folding>
             <element signature="e#23#35#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fb_heading_calc.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="109" column="38" selection-start-line="109" selection-start-column="38" selection-end-line="109" selection-end-column="38" />
+          <folding />
         </state>
       </provider>
     </entry>
