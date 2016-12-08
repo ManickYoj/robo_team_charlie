@@ -12,7 +12,7 @@ import roslib; #roslib.load_manifest(PKG)
 import rospy
 from rospy.numpy_msg import numpy_msg
 
-practiceImg="./sampleImages/trafficCone.jpg"
+practiceImg="./sampleImages/coneline2.jpg"
 
 def talker(val):
     pub = rospy.Publisher('camera', Int8MultiArray,queue_size=10)
@@ -75,6 +75,11 @@ while not rospy.is_shutdown():
     # Capture frame-by-frame
     #ret, frame = cap.read() #gets the frame
     frame=cv2.imread(practiceImg)
+    height, width, channels = frame.shape
+    print height
+    print width
+    print channels
+    frame = frame[100:600, :]
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     #cv2.imshow('Colors', frame) #display filtered out thing
     orangeLower=numpy.array([5, 42, 160], dtype="uint8") #uint8 necessary for this kind of thing 
