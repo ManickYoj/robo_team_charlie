@@ -16,14 +16,18 @@ to the waypoint.
 '''
 
 import rospy
+import rospkg
 import json
 import os
 from std_msgs.msg import String, Float64MultiArray
 from sensor_msgs.msg import NavSatFix
 
+rospack = rospkg.RosPack()
+
 # -- Config
 COURSE = 'SAFE'
-COURSEFILE = './src/robo_team_charlie/courses.json'
+#COURSEFILE = '~/catkin_ws/src/robo_team_charlie/courses.json'
+COURSEFILE = rospack.get_path('robo_team_charlie')+'/courses.json'
 WAYPOINT_RADIUS = 2; # Waypoint radius in meters
 DEBUG = True
 
