@@ -85,15 +85,17 @@ void DirectionFinder::recalculateHeading() {
 	if (waypoint == NULL) return;
 	if (heading == NULL) return;
 	if (position == NULL) return;
-	/*
-			TODO: Use stored data to calculate a heading from
-			the current position to the waypoint.
-	*/
+
+	std::stringstream ss;
+	ss << "Null tests passed.";
+	chatter(ss.str());
 
 	// Calculate waypoint direction vector
 	double deltaX = waypoint->getX()-position->getX();
 	double deltaY = waypoint->getY()-position->getY();
 
+	ss << "Deltas: (" << deltaX << ", " << deltaY << ")\n";
+	chatter(ss.str());
 
 	// Angle between heading to waypoint and true North
 	// Left is positive, right is negative
@@ -101,25 +103,27 @@ void DirectionFinder::recalculateHeading() {
 	if (deltaY == 0 && deltaX == 0) return;
 	double desiredHeading = boundAngle(atan2(deltaY, deltaX) - M_PI /2);
 
+	ss << "Desired Heading: (" << desiredHeading << ")\n";
+	chatter(ss.str());
+
 	// Difference between current heading and heading to waypoint
 	// Ideally 0
-	// double currentHeading = (double) *heading;
-	// double headingChange = boundAngle(desiredHeading - currentHeading);
+	double currentHeading = (double) *heading;
+	double headingChange = boundAngle(desiredHeading - currentHeading);
 
-	// // Test output of angle to waypoint
-	// std::stringstream ss;
-	// ss << "Desired heading change: " << headingChange;
-	// chatter(ss.str());
+	// Test output of angle to waypoint
+	ss << "Desired heading change: " << headingChange;
+	chatter(ss.str());
 
-	// // Calculate the angular and linear vel outputs
-	// double angular_vel = scale(headingChange, M_PI, LINEAR_MAX);
-	// double linear_vel = LINEAR_MAX;
+	// Calculate the angular and linear vel outputs
+	double angular_vel = scale(headingChange, M_PI, LINEAR_MAX);
+	double linear_vel = LINEAR_MAX;
 
-	// // Publish the desired cmd_vel array
-	// std_msgs::Int8MultiArray cmd_vel;
-	// cmd_vel.data.push_back(int(linear_vel));
-	// cmd_vel.data.push_back(int(angular_vel));
-	// output.publish(cmd_vel);
+	// Publish the desired cmd_vel array
+	std_msgs::Int8MultiArray cmd_vel;
+	cmd_vel.data.push_back(int(linear_vel));
+	cmd_vel.data.push_back(int(angular_vel));
+	output.publish(cmd_vel);
 }
 
 /**
