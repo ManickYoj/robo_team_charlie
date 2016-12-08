@@ -11,6 +11,7 @@
 #include "sensor_msgs/Imu.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Int8MultiArray.h"
+#include "std_msgs/Float64MultiArray.h"
 
 
 
@@ -34,13 +35,13 @@ double scale(double input, double input_range, double max) {
 }
 
 tf::Point toLocalCoords(double longitude, double latitude) {
-    double latDiff = ORIGIN_LAT - latitude;
-    double longDiff = ORIGIN_LONG - longitude;
+		double latDiff = ORIGIN_LAT - latitude;
+		double longDiff = ORIGIN_LONG - longitude;
 
-    double x_meters = longDiff * LONG_TO_M;
-    double y_meters = latDiff * LAT_TO_M ;
+		double x_meters = longDiff * LONG_TO_M;
+		double y_meters = latDiff * LAT_TO_M ;
 
-    return tf::Point(x_meters, y_meters, 0);
+		return tf::Point(x_meters, y_meters, 0);
 }
 
 class DirectionFinder {
@@ -64,12 +65,12 @@ class DirectionFinder {
 
 
 			// Set up subscriptions to required data sources:
-		  gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
-		  compassSub = n.subscribe("/imu/mag", 1000, &DirectionFinder::updateHeading, this);
-		  waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
+			gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
+			compassSub = n.subscribe("/imu/mag", 1000, &DirectionFinder::updateHeading, this);
+			waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
 		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
-		void updateWaypoint(const sensor_msgs::NavSatFix &waypoint);
+		void updateWaypoint(const std_msgs::Float64MultiArray &waypoint);
 		void updateHeading(const geometry_msgs::Vector3Stamped &heading);
 };
 
@@ -84,15 +85,17 @@ void DirectionFinder::recalculateHeading() {
 	if (waypoint == NULL) return;
 	if (heading == NULL) return;
 	if (position == NULL) return;
-  /*
-      TODO: Use stored data to calculate a heading from
-      the current position to the waypoint.
-  */
+
+	std::stringstream ss;
+	ss << "Null tests passed.";
+	chatter(ss.str());
 
 	// Calculate waypoint direction vector
 	double deltaX = waypoint->getX()-position->getX();
 	double deltaY = waypoint->getY()-position->getY();
 
+	ss << "Deltas: (" << deltaX << ", " << deltaY << ")\n";
+	chatter(ss.str());
 
 	// Angle between heading to waypoint and true North
 	// Left is positive, right is negative
@@ -100,12 +103,15 @@ void DirectionFinder::recalculateHeading() {
 	if (deltaY == 0 && deltaX == 0) return;
 	double desiredHeading = boundAngle(atan2(deltaY, deltaX) - M_PI /2);
 
+	ss << "Desired Heading: (" << desiredHeading << ")\n";
+	chatter(ss.str());
+
 	// Difference between current heading and heading to waypoint
 	// Ideally 0
-	double headingChange = boundAngle(desiredHeading - *heading);
+	double currentHeading = (double) *heading;
+	double headingChange = boundAngle(desiredHeading - currentHeading);
 
 	// Test output of angle to waypoint
-	std::stringstream ss;
 	ss << "Desired heading change: " << headingChange;
 	chatter(ss.str());
 
@@ -152,7 +158,7 @@ void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 		ss << "Updated Position: (" << temp.getX() << ", " << temp.getY() << ")";
 		chatter(ss.str());
 
-    this->recalculateHeading();
+		this->recalculateHeading();
 }
 
 /**
@@ -160,11 +166,11 @@ void DirectionFinder::updateGPS (const sensor_msgs::NavSatFix &gpsPosition)
 
 	@param waypoint
 */
-void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &gpsWaypoint)
+void DirectionFinder::updateWaypoint (const std_msgs::Float64MultiArray &gpsWaypoint)
 {
 		// Convert GPS waypoint to local frame
-		double latitude = (double) gpsWaypoint.latitude;
-		double longitude= (double) gpsWaypoint.longitude;
+		double latitude = (double) gpsWaypoint.data[0];
+		double longitude= (double) gpsWaypoint.data[1];
 		tf::Point temp = toLocalCoords(latitude, longitude);
 		this->waypoint = &temp;
 
@@ -173,7 +179,7 @@ void DirectionFinder::updateWaypoint (const sensor_msgs::NavSatFix &gpsWaypoint)
 		ss << "Updated Waypoint: (" << temp.getX() << ", " << temp.getY() << ")";
 		chatter(ss.str());
 
-    this->recalculateHeading();
+		this->recalculateHeading();
 }
 
 /**
@@ -197,7 +203,7 @@ void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &headin
 		ss << "Heading from Magnetic North: " << uncorrectedHeading << "\nHeading from True North: " << heading.vector.y;
 		chatter(ss.str());
 
-    this->recalculateHeading();
+		this->recalculateHeading();
 }
 
 
