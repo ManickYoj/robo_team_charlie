@@ -24,9 +24,13 @@ class Midbrain_Arbiter(object):
 	def update_flag(self, value):
 		self.flag = value.data
 
-	def wpt_cmd_vel_cb(self, msg):
+	def wpt_cmd_vel_cb(self, vels):
 		if(self.flag==0): #not object avoidance
-			self.update_array(msg.data, INPUTS.index('wpt'))
+			#self.update_array(msg.data, INPUTS.index('wpt'))
+			msg = Twist()
+			msg.linear.x = int(vels.data[0])
+			msg.angular.z = int(vels.data[1])
+			self.cmd_vel_pub.publish(msg)
 		else: #in the event of object avoidance
 			pass
 
