@@ -41,7 +41,6 @@ def findCenter(cnts):
     return centers
 
 def distanceCalc(pt1,pt2): #calculates horizontal distance of cones
-    print pt1[0]
     distance=abs(pt1[0]-pt2[0])
     return distance
 
@@ -54,11 +53,24 @@ def calcGap(centers): #finding the largest gap between two centers
             maxDistance= distanceCalc(centerAr[p], centerAr[p+1])
             point1=centerAr[p]
             point2=centerAr[p+1]
-return point1, point2
+    return point1, point2
 
-def headingCalc():
-    #to do
-    pass
+def headingCalc(pt1, pt2, img):
+    #because an image is really just a matrix of r, c...
+    numColumns=len(img[0])
+    distbWsections=numColumns/7
+    #because point1 is closer to the left no matter what, it'll be the lower one
+    minSection=pt1[0]/distbWsections+1
+    print minSection
+    #to be conservative, compensate by subtracting to get the right section
+    maxSection=(pt2[1]/distbWsections)
+    print maxSection
+    val=[0,0,0,0,0,0,0]
+    for i in range(0,6):
+        if(i<=minSection and i>=maxSection):
+            val[i]=1
+    return val
+
 
 #while(True):
 # Capture frame-by-frame
@@ -86,7 +98,8 @@ contours, hierarchy= cv2.findContours(edged,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_S
 cv2.drawContours(output, contours, -1, (255,0,0),-1)
 
 centers=findCenter(contours)
-calcGap(centers)
+point1, point2=calcGap(centers)
+headingCalc(point1, point2, output)
 
 ###Showing you what happened
 cv2.imshow('Output', output) #display filtered out thing
