@@ -76,6 +76,7 @@ def headingCalc(pt1, pt2, img):
 # Capture frame-by-frame
 #ret, frame = cap.read() #gets the frame
 frame=cv2.imread(practiceImg)
+
 #cv2.imshow('Colors', frame) #display filtered out thing
 orangeLower=numpy.array([5, 50, 150], dtype="uint8") #uint8 necessary for this kind of thing 
 orangeUpper=numpy.array([100, 200, 255], dtype= "uint8") #represents upper and lower bounds of the color "orange"

@@ -19,10 +19,17 @@ std::vector<float> average_ranges;
 sensor_msgs::LaserScan scan;
 sensor_msgs::LaserScan filtered_scan;
 
+
+ros::NodeHandle n;
+
 // ros::Publisher pub_arb;
-ros::Publisher pub_filtered_scan;
-ros::Publisher pub_flag;
-ros::Publisher pub_vel;
+ros::Publisher pub_flag = n.advertise<std_msgs::Int8>("obst/avoid",1000);
+ros::Publisher pub_vel =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000);
+// ros::Publisher pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
+ros::Publisher pub_filtered_scan =n.advertise<sensor_msgs::LaserScan>("obst/filtered_scan", 1000);
+// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
+
+
 // ros::Publisher pub_ang;
 
 std_msgs::Int8 flag;
@@ -195,6 +202,9 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 
 }
 
+ros::Subscriber sub_imu = n.subscribe("scan", 1000, controlSpeed);
+ros::Subscriber sub_lidar = n.subscribe("scan",1000,getLIDAR);
+
 //I probably messed something up in implementation here. If someone could check me that'd be great
 int main(int argc, char **argv)
 {
@@ -203,16 +213,8 @@ int main(int argc, char **argv)
 
 	ros::init(argc, argv, "midbrain");
 
-	ros::NodeHandle n;
 
-	ros::Subscriber sub_imu = n.subscribe("scan", 1000, controlSpeed);
-	ros::Subscriber sub_lidar = n.subscribe("scan",1000,getLIDAR);
 
-	ros::Publisher pub_flag = n.advertise<std_msgs::Int8>("obst/avoid",1000);
-	ros::Publisher pub_vel =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000);
-	// ros::Publisher pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
-	ros::Publisher pub_filtered_scan =n.advertise<sensor_msgs::LaserScan>("obst/filtered_scan", 1000);
-	// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
 
 	ros::spin();
 
