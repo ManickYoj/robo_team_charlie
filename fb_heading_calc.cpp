@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
 {
 	// Initialize DirectionFinder
 	ros::init(argc, argv, "heading_calculator");
-  DirectionFinder d;
-  ros::spin();
-  return 0;
+	DirectionFinder d;
+	ros::spin();
+	return 0;
 }
