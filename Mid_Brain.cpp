@@ -19,10 +19,12 @@ std::vector<float> average_ranges;
 sensor_msgs::LaserScan scan;
 sensor_msgs::LaserScan filtered_scan;
 
-ros::Publisher pub_arb;
+// ros::Publisher pub_arb;
 ros::Publisher pub_filtered_scan;
+ros::Publisher pub_flag;
+ros::Publisher pub_vel;
+// ros::Publisher pub_ang;
 
-ros::Publisher *avoidanceFlag;    //for publishing the flag-- whether or not obstacle avoidance is happening
 std_msgs::Int8 flag;
 
 
@@ -97,7 +99,8 @@ void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
 	}
 
 
-	pub_arb.publish(cmd_array);
+	pub_vel.publish(cmd_array);
+	pub_flag.publish(flag);
 	cmd_array.data.clear();
 
 	// DEBUG
@@ -187,7 +190,7 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 
 	pub_filtered_scan.publish(filtered_scan);
 
-	pub_arb.publish(cmd_array);
+	pub_vel.publish(cmd_array);
 	cmd_array.data.clear();
 
 }
@@ -202,13 +205,14 @@ int main(int argc, char **argv)
 
 	ros::NodeHandle n;
 
-	//ros::Publisher flag_pub = n.advertise<std_msgs::Int8>(flag, 1000); //publishing the flag
 	ros::Subscriber sub_imu = n.subscribe("scan", 1000, controlSpeed);
 	ros::Subscriber sub_lidar = n.subscribe("scan",1000,getLIDAR);
 
-	ros::Publisher pub_flag = n.advertise<std_msgs::Int8>("flag",1000);
+	ros::Publisher pub_flag = n.advertise<std_msgs::Int8>("obst/avoid",1000);
 	ros::Publisher pub_vel =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000);
-	ros::Publisher pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
+	// ros::Publisher pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
+	ros::Publisher pub_filtered_scan =n.advertise<sensor_msgs::LaserScan>("obst/filtered_scan", 1000);
+	// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
 
 	ros::spin();
 
