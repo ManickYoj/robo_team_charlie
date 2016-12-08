@@ -35,9 +35,10 @@ bool straight = true;
 char light_state = 'f';
 
 unsigned long previousMillis = 0;        // will store last time LED was updated 
-unsigned long interval = 50;           // interval at which to blink (milliseconds)
-uint16_t i = 0;
-uint16_t j = 0;
+unsigned long interval = 60;           // interval at which to blink (milliseconds)
+uint16_t i = 8;
+uint16_t j = 8;
+uint16_t k = 0;
 
 boolean  eStopTriggered;
 
@@ -72,6 +73,8 @@ void cb(const geometry_msgs::Twist& twist_msg){
   if (angular < 0){
     turnLeft = true;
     turnRight = false;
+    straight = false;
+    
     //negative angle = turn left
     leftMotorSpeed = velocity + angular;
     rightMotorSpeed = velocity;
@@ -93,6 +96,8 @@ void cb(const geometry_msgs::Twist& twist_msg){
   if (angular > 0){
     turnRight = true;
     turnLeft = false;
+    straight = false;
+    
     //positive angle = turn right
     leftMotorSpeed = velocity;
     rightMotorSpeed = velocity - angular;
@@ -149,9 +154,9 @@ void setup() {
   // set the colors for the strip
   for( int i = 0; i < numPixels; i++ ){
        h1.setPixelColor(i, 255, 255, 255);
-       h1.setBrightness(50);
+       //h1.setBrightness(50);
        h2.setPixelColor(i, 255, 255, 255);
-       h2.setBrightness(50);
+       //h2.setBrightness(50);
   }
   
   h1.show();
@@ -206,13 +211,13 @@ void loop() {
   
   //if there's no ground set motor speeds to zero
   if (leftIR_range > 50.0 || rightIR_range > 50.0){
-    leftMotorSpeed = 0;
-    rightMotorSpeed = 0;
+    leftMotorSpeed = 85;
+    rightMotorSpeed = 85;
   }
  
-    //write the motor speeds to the motor
-    leftMotor.write(leftMotorSpeed);
-    rightMotor.write(rightMotorSpeed); 
+  //write the motor speeds to the motor
+  leftMotor.write(leftMotorSpeed);
+  rightMotor.write(rightMotorSpeed); 
  
   
   //set the data to be published
@@ -248,14 +253,14 @@ void turn_left_lights(uint32_t c){
     b2.setPixelColor(i,b2.Color(255,0,0));
     b1.setPixelColor(i,b1.Color(0,0,255));
     b2.show();
-    i++;
-    if (i==8){
+    i--;
+    if (i==0){
       b1.show();
       for(uint16_t i=0; i<b2.numPixels(); i++) {
         b2.setPixelColor(i  , 0); // Draw new pixel
       }
       b2.show();
-      i=0;
+      i=8;
     }
   }
 }
@@ -263,17 +268,17 @@ void turn_left_lights(uint32_t c){
 void turn_right_lights(uint32_t c){
   if ((unsigned long)(millis() - previousMillis) >= interval) {
     previousMillis = millis();
-    b1.setPixelColor(i,b1.Color(255,0,0));
-    b2.setPixelColor(i,b2.Color(0,0,255));
+    b1.setPixelColor(j,b1.Color(255,0,0));
+    b2.setPixelColor(j,b2.Color(0,0,255));
     b1.show();
-    i++;
-    if (i==8){
+    j--;
+    if (j==0){
       b2.show();
       for(uint16_t i=0; i<b1.numPixels(); i++) {
         b1.setPixelColor(i  , 0); // Draw new pixel
       }
       b1.show();
-      i=0;
+      j=8;
     }
   }
 }
@@ -281,13 +286,13 @@ void turn_right_lights(uint32_t c){
 void straight_lights(){
   if ((unsigned long)(millis() - previousMillis) >= interval) {
     previousMillis = millis();
-    b1.setPixelColor(i,b1.Color(0,255,0));
-    b2.setPixelColor(i,b2.Color(0,255,0));
-    i++;
-    if (i==8){
+    b1.setPixelColor(k,b1.Color(0,255,0));
+    b2.setPixelColor(k,b2.Color(0,255,0));
+    k++;
+    if (k==8){
       b1.show();
       b2.show();
-      i=0;
+      k=0;
     }
   }  
 }
