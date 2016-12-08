@@ -18,37 +18,51 @@ std::vector<float> average_ranges;
 
 sensor_msgs::LaserScan scan;
 sensor_msgs::LaserScan filtered_scan;
-
-
-ros::NodeHandle n;
-
-// ros::Publisher pub_arb;
-ros::Publisher pub_flag = n.advertise<std_msgs::Int8>("obst/avoid",1000);
-ros::Publisher pub_vel =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000);
-// ros::Publisher pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
-ros::Publisher pub_filtered_scan =n.advertise<sensor_msgs::LaserScan>("obst/filtered_scan", 1000);
-// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
-
-
-// ros::Publisher pub_ang;
-
 std_msgs::Int8 flag;
 
 
 int rolling_length = 5;
 
 int backward[22] = {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int stop[22] =     {0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int forward[22] =  {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int right[22] =   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-										0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0};
+                   0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0};
 int straight[22] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
+                    0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
 int left[22] =     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0};
+                    0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0};
+
+
+
+int main(int argc, char **argv)
+{
+    flag.data=0;
+    cmd_array.data.assign(&stop[0], &stop[0]+22);
+
+    ros::init(argc, argv, "midbrain");
+
+
+    ros::spin();
+
+    return 0;
+}
+
+ros::NodeHandle n;
+ros::Publisher pub_flag = n.advertise<std_msgs::Int8>("obst/avoid",1000);
+ros::Publisher pub_vel =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000);
+// ros::Publisher pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
+ros::Publisher pub_filtered_scan =n.advertise<sensor_msgs::LaserScan>("obst/filtered_scan", 1000);
+
+// ros::Publisher pub_arb;
+
+// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
+
+
+// ros::Publisher pub_ang;
 
 
 void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
@@ -127,7 +141,6 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 	filtered_scan.angle_increment = lidar_scan.angle_increment;
 	filtered_scan.range_max = lidar_scan.range_max;
 	filtered_scan.range_min = lidar_scan.range_min;
-	std::vector<int> indices;
 
 	long number_of_ranges = lidar_scan.ranges.size();
 
@@ -205,18 +218,3 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 ros::Subscriber sub_imu = n.subscribe("scan", 1000, controlSpeed);
 ros::Subscriber sub_lidar = n.subscribe("scan",1000,getLIDAR);
 
-//I probably messed something up in implementation here. If someone could check me that'd be great
-int main(int argc, char **argv)
-{
-	flag.data=0;
-	cmd_array.data.assign(&stop[0], &stop[0]+22);
-
-	ros::init(argc, argv, "midbrain");
-
-
-
-
-	ros::spin();
-
-	return 0;
-}
