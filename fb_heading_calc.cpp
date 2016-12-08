@@ -91,7 +91,14 @@ void DirectionFinder::recalculateHeading() {
 	chatter(ss.str());
 
 	// Calculate waypoint direction vector
-	double deltaX = waypoint->getX()-position->getX();
+	double deltaXw = waypoint->getX();
+	ss << "deltaXw";
+	chatter(ss.str());
+	double deltaXp = position->getX();
+	ss << "deltaXp";
+	chatter(ss.str());
+	double deltaX = deltaXw - deltaXp;
+
 	double deltaY = waypoint->getY()-position->getY();
 
 	ss << "Deltas: (" << deltaX << ", " << deltaY << ")\n";

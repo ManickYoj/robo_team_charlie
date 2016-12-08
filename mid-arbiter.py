@@ -38,7 +38,8 @@ class Midbrain_Arbiter(object):
 		self.update_array(msg.data, INPUTS.index('obst'))
 
 	def update_array(self, data, row):
-		data = np.asarray(data).reshape([2, ARRAY_SIZE])
+		data = np.asarray(data).reshape\
+			([2, ARRAY_SIZE])
 		self.vel_array[row] = data[0]
 		self.turn_array[row] = data[1]
 
