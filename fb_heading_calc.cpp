@@ -106,7 +106,6 @@ void DirectionFinder::recalculateHeading() {
 	double deltaYp = position->getY();
 	ss << "deltaYp";
 	chatter(ss.str());
-
 	double deltaY = deltaYw - deltaYp;
 	ss << "deltaY";
 	chatter(ss.str());
@@ -138,8 +137,8 @@ void DirectionFinder::recalculateHeading() {
 
 	// Publish the desired cmd_vel array
 	std_msgs::Int8MultiArray cmd_vel;
-	cmd_vel.data.push_back(int(linear_vel));
-	cmd_vel.data.push_back(int(angular_vel));
+	cmd_vel.data.push_back(char(int(linear_vel)));
+	cmd_vel.data.push_back(char(int(angular_vel)));
 	output.publish(cmd_vel);
 }
 
@@ -228,7 +227,7 @@ int main(int argc, char* argv[])
 {
 	// Initialize DirectionFinder
 	ros::init(argc, argv, "heading_calculator");
-	DirectionFinder d;
+	DirectionFinder d();
 	ros::spin();
 	return 0;
 }
