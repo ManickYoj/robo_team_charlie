@@ -81,29 +81,30 @@ class DirectionFinder {
 	topic targeted by DirectionFinder->output.
 */
 void DirectionFinder::recalculateHeading() {
-	// // Return early if insufficient information available
-	// if (waypoint == NULL) return;
-	// if (heading == NULL) return;
-	// if (position == NULL) return;
-	// /*
-	// 		TODO: Use stored data to calculate a heading from
-	// 		the current position to the waypoint.
-	// */
+	// Return early if insufficient information available
+	if (waypoint == NULL) return;
+	if (heading == NULL) return;
+	if (position == NULL) return;
+	/*
+			TODO: Use stored data to calculate a heading from
+			the current position to the waypoint.
+	*/
 
-	// // Calculate waypoint direction vector
-	// double deltaX = waypoint->getX()-position->getX();
-	// double deltaY = waypoint->getY()-position->getY();
+	// Calculate waypoint direction vector
+	double deltaX = waypoint->getX()-position->getX();
+	double deltaY = waypoint->getY()-position->getY();
 
 
-	// // Angle between heading to waypoint and true North
-	// // Left is positive, right is negative
-	// // Note: will error out if deltaY and deltaX are 0, therefore, catch this case
-	// if (deltaY == 0 && deltaX == 0) return;
-	// double desiredHeading = boundAngle(atan2(deltaY, deltaX) - M_PI /2);
+	// Angle between heading to waypoint and true North
+	// Left is positive, right is negative
+	// Note: will error out if deltaY and deltaX are 0, therefore, catch this case
+	if (deltaY == 0 && deltaX == 0) return;
+	double desiredHeading = boundAngle(atan2(deltaY, deltaX) - M_PI /2);
 
-	// // Difference between current heading and heading to waypoint
-	// // Ideally 0
-	// double headingChange = boundAngle(desiredHeading - *heading);
+	// Difference between current heading and heading to waypoint
+	// Ideally 0
+	// double currentHeading = (double) *heading;
+	// double headingChange = boundAngle(desiredHeading - currentHeading);
 
 	// // Test output of angle to waypoint
 	// std::stringstream ss;
