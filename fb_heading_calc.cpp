@@ -7,6 +7,7 @@
 #include "ros/ros.h"
 #include "geometry_msgs/Vector3.h"
 #include "geometry_msgs/Point.h"
+#include "geometry_msgs/TwistStamped.h"
 #include "sensor_msgs/NavSatFix.h"
 #include "sensor_msgs/Imu.h"
 #include "std_msgs/String.h"
@@ -47,11 +48,13 @@ tf::Point toLocalCoords(double longitude, double latitude) {
 class DirectionFinder {
 	private:
 		double heading;
+		double gpsHeading;
 		tf::Point position;
 		tf::Point waypoint;
 		bool headingAvailable;
 		bool positionAvailable;
 		bool waypointAvailable;
+		bool gpsHeadingAvailable;
 		ros::NodeHandle n;
 		ros::Publisher logging;
 		ros::Publisher output;
@@ -64,6 +67,7 @@ class DirectionFinder {
 	public:
 		DirectionFinder() {
 			headingAvailable = false;
+			gpsHeadingAvailable = false;
 			positionAvailable = false;
 			waypointAvailable = false;
 
@@ -74,10 +78,12 @@ class DirectionFinder {
 			gpsSub = n.subscribe("/fix", 1000, &DirectionFinder::updateGPS, this);
 			compassSub = n.subscribe("/imu/mag", 1000, &DirectionFinder::updateHeading, this);
 			waypointSub = n.subscribe("/waypoint", 1000, &DirectionFinder::updateWaypoint, this);
+			waypointSub = n.subscribe("/vel", 1000, &DirectionFinder::updateGPSHeading, this);
 		}
 		void updateGPS(const sensor_msgs::NavSatFix &gpsPosition);
 		void updateWaypoint(const std_msgs::Float64MultiArray &waypoint);
 		void updateHeading(const geometry_msgs::Vector3Stamped &heading);
+		void updateGPSHeading(const geometry_msgs::TwistStamped &gpsVel);
 };
 
 /**
@@ -104,7 +110,8 @@ void DirectionFinder::recalculateHeading() {
 
 	// Difference between current heading and heading to waypoint
 	// Ideally 0
-	double headingChange = boundAngle(desiredHeading - heading);
+	double usedHeading = gpsHeadingAvailable ? gpsHeading : heading;
+	double headingChange = boundAngle(desiredHeading - usedHeading);
 
 	// Test output of angle to waypoint
 	std::stringstream ss;
@@ -202,6 +209,20 @@ void DirectionFinder::updateHeading (const geometry_msgs::Vector3Stamped &headin
 		chatter(ss.str());
 
 		this->recalculateHeading();
+}
+
+void DirectionFinder::updateGPSHeading(const geometry_msgs::TwistStamped &gpsVel) {
+	gpsHeadingAvailable = true;
+	headingAvailable = true;
+
+	// Assumes y is north and x is east (unconfirmed)
+	this->gpsHeading = atan2(gpsVel.twist.linear.x, gpsVel.twist.linear.y);
+
+	std::stringstream ss;
+	ss << "GPS-Based Heading: " << this->gpsHeading;
+	chatter(ss.str());
+
+	this->recalculateHeading();
 }
 
 
