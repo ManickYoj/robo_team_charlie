@@ -13,6 +13,7 @@
 
 Servo leftMotor;
 Servo rightMotor;
+Servo lidar;
 uint32_t c;
 int leftIR = A0;
 int rightIR = A1;
@@ -149,7 +150,7 @@ void setup() {
   b2.clear();
   leftMotor.attach(7);
   rightMotor.attach(6);
-
+  lidar.attach(4);
   
   // set the colors for the strip
   for( int i = 0; i < numPixels; i++ ){
@@ -175,6 +176,7 @@ void setup() {
   
   mcb.data = (int16_t*) malloc(3);
   mcb.data_length = 2;
+  lidar.write(90);
 }
 
 void loop() {
@@ -218,7 +220,7 @@ void loop() {
   //write the motor speeds to the motor
   leftMotor.write(leftMotorSpeed);
   rightMotor.write(rightMotorSpeed); 
- 
+
   
   //set the data to be published
   ir.data[0] = leftIR_range;
