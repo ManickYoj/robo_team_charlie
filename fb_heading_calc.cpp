@@ -81,44 +81,44 @@ class DirectionFinder {
 	topic targeted by DirectionFinder->output.
 */
 void DirectionFinder::recalculateHeading() {
-	// Return early if insufficient information available
-	if (waypoint == NULL) return;
-	if (heading == NULL) return;
-	if (position == NULL) return;
-	/*
-			TODO: Use stored data to calculate a heading from
-			the current position to the waypoint.
-	*/
+	// // Return early if insufficient information available
+	// if (waypoint == NULL) return;
+	// if (heading == NULL) return;
+	// if (position == NULL) return;
+	// /*
+	// 		TODO: Use stored data to calculate a heading from
+	// 		the current position to the waypoint.
+	// */
 
-	// Calculate waypoint direction vector
-	double deltaX = waypoint->getX()-position->getX();
-	double deltaY = waypoint->getY()-position->getY();
+	// // Calculate waypoint direction vector
+	// double deltaX = waypoint->getX()-position->getX();
+	// double deltaY = waypoint->getY()-position->getY();
 
 
-	// Angle between heading to waypoint and true North
-	// Left is positive, right is negative
-	// Note: will error out if deltaY and deltaX are 0, therefore, catch this case
-	if (deltaY == 0 && deltaX == 0) return;
-	double desiredHeading = boundAngle(atan2(deltaY, deltaX) - M_PI /2);
+	// // Angle between heading to waypoint and true North
+	// // Left is positive, right is negative
+	// // Note: will error out if deltaY and deltaX are 0, therefore, catch this case
+	// if (deltaY == 0 && deltaX == 0) return;
+	// double desiredHeading = boundAngle(atan2(deltaY, deltaX) - M_PI /2);
 
-	// Difference between current heading and heading to waypoint
-	// Ideally 0
-	double headingChange = boundAngle(desiredHeading - *heading);
+	// // Difference between current heading and heading to waypoint
+	// // Ideally 0
+	// double headingChange = boundAngle(desiredHeading - *heading);
 
-	// Test output of angle to waypoint
-	std::stringstream ss;
-	ss << "Desired heading change: " << headingChange;
-	chatter(ss.str());
+	// // Test output of angle to waypoint
+	// std::stringstream ss;
+	// ss << "Desired heading change: " << headingChange;
+	// chatter(ss.str());
 
-	// Calculate the angular and linear vel outputs
-	double angular_vel = scale(headingChange, M_PI, LINEAR_MAX);
-	double linear_vel = LINEAR_MAX;
+	// // Calculate the angular and linear vel outputs
+	// double angular_vel = scale(headingChange, M_PI, LINEAR_MAX);
+	// double linear_vel = LINEAR_MAX;
 
-	// Publish the desired cmd_vel array
-	std_msgs::Int8MultiArray cmd_vel;
-	cmd_vel.data.push_back(int(linear_vel));
-	cmd_vel.data.push_back(int(angular_vel));
-	output.publish(cmd_vel);
+	// // Publish the desired cmd_vel array
+	// std_msgs::Int8MultiArray cmd_vel;
+	// cmd_vel.data.push_back(int(linear_vel));
+	// cmd_vel.data.push_back(int(angular_vel));
+	// output.publish(cmd_vel);
 }
 
 /**
