@@ -1,9 +1,10 @@
-
 import cv2
 import numpy
 import time
 import rospy
 from std_msgs.msg import String
+import math
+from operator import itemgetter
 
 practiceImg="./sampleImages/coneline4.jpg"
 
@@ -26,9 +27,9 @@ def talker():
 cap = cv2.VideoCapture(0) #opening webcam
 
 def findCenter(cnts):
-    centers=[]
-    for c in cnts:
-        if(cv2.arcLength(c, 1)>30):
+    centers=[] #just an array j chilling
+    for c in cnts: #goin' through those contours lyke
+        if(cv2.arcLength(c, 1)>30): #filtering out false negatives
         # compute the center of the contour
             M = cv2.moments(c)
             cX = int(M["m10"] / M["m00"])
@@ -39,9 +40,21 @@ def findCenter(cnts):
             cv2.circle(output, (cX, cY), 7, (255, 255, 255), -1)
     return centers
 
-def calcGap(centers):
-    #to do
-    pass
+def distanceCalc(pt1,pt2): #calculates horizontal distance of cones
+    print pt1[0]
+    distance=abs(pt1[0]-pt2[0])
+    return distance
+
+
+def calcGap(centers): #finding the largest gap between two centers
+    centerAr= sorted(centers, key=itemgetter(0)) #sorts in order of horizontal distance
+    maxDistance=0
+    for p in range(0, len(centerAr)-1):  #goes through each 2 consecutive points
+        if(distanceCalc(centerAr[p], centerAr[p+1])>maxDistance):
+            maxDistance= distanceCalc(centerAr[p], centerAr[p+1])
+            point1=centerAr[p]
+            point2=centerAr[p+1]
+return point1, point2
 
 def headingCalc():
     #to do
@@ -71,7 +84,9 @@ edged = cv2.Canny(blurred, 50, 150)
 contours, hierarchy= cv2.findContours(edged,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 #drawing said contours
 cv2.drawContours(output, contours, -1, (255,0,0),-1)
-print findCenter(contours)
+
+centers=findCenter(contours)
+calcGap(centers)
 
 ###Showing you what happened
 cv2.imshow('Output', output) #display filtered out thing
