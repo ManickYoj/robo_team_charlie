@@ -32,8 +32,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="be73c9b9-1b28-432c-b2c9-7c0a86e57e9e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mid-arbiter.py" afterPath="$PROJECT_DIR$/mid-arbiter.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/coneFindingCamera.py" afterPath="$PROJECT_DIR$/coneFindingCamera.py" />
     </list>
     <ignored path="robo_team_charlie.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -74,7 +73,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="mid-arbiter.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="mid-arbiter.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mid-arbiter.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="371">
@@ -96,11 +95,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="coneFindingCamera.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="coneFindingCamera.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/coneFindingCamera.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="79" column="53" selection-start-line="79" selection-start-column="53" selection-end-line="79" selection-end-column="53" />
+            <state relative-caret-position="162">
+              <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -128,11 +127,11 @@
         <option value="$PROJECT_DIR$/test.cpp" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/test_camera.cpp" />
-        <option value="$PROJECT_DIR$/coneFindingCamera.py" />
         <option value="$PROJECT_DIR$/launch.launch" />
         <option value="$PROJECT_DIR$/fb_heading_calc.cpp" />
         <option value="$PROJECT_DIR$/Mid_Brain.cpp" />
         <option value="$PROJECT_DIR$/mid-arbiter.py" />
+        <option value="$PROJECT_DIR$/coneFindingCamera.py" />
       </list>
     </option>
   </component>
@@ -608,14 +607,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/detectSquares.cpp" />
     <entry file="file://$PROJECT_DIR$/test_camera.cpp" />
-    <entry file="file://$PROJECT_DIR$/coneFindingCamera.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="79" column="53" selection-start-line="79" selection-start-column="53" selection-end-line="79" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/launch.launch">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
@@ -647,6 +638,14 @@
           <folding>
             <element signature="e#23#35#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/coneFindingCamera.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
