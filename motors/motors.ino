@@ -66,14 +66,12 @@ void cb(const geometry_msgs::Twist& twist_msg){
   leftMotorSpeed= velocity;
   rightMotorSpeed = velocity;
   
-
-  
   angular = (int) twist_msg.angular.z;
   //angular = map(angular,-100,100,-1,1);
- 
-    
   
   if (angular < 0){
+    turnLeft = true;
+    turnRight = false;
     //negative angle = turn left
     leftMotorSpeed = velocity + angular;
     rightMotorSpeed = velocity;
@@ -90,10 +88,11 @@ void cb(const geometry_msgs::Twist& twist_msg){
     else if (rightMotorSpeed<-100){
       rightMotorSpeed == -100;
     }
-    
 
   }
   if (angular > 0){
+    turnRight = true;
+    turnLeft = false;
     //positive angle = turn right
     leftMotorSpeed = velocity;
     rightMotorSpeed = velocity - angular;
