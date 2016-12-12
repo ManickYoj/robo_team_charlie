@@ -116,7 +116,7 @@ void DirectionFinder::recalculateHeading() {
 	chatter(ss.str());
 
 	// Calculate the angular and linear vel outputs
-	double angular_vel = scale(headingChange, M_PI, LINEAR_MAX);
+	double angular_vel = scale(-headingChange, M_PI, ANGULAR_MAX);
 	double linear_vel = LINEAR_MAX;
 
 	// Publish the desired cmd_vel array
