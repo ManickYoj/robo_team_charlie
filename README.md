@@ -17,4 +17,4 @@ Never push directly to master (in fact, you won't be able to). Instead:
 ## Robotic Brain Diagram (Click to Enlarge)
 Currently shows the fore-brain setup, but mid and hind-brain have yet to be added.
 
-![A diagram of the robot's 'brain' structure](robo_team_charlie/documentation/Charlie Brain Flow.svg)
+![A diagram of the robot's 'brain' structure](https://raw.githubusercontent.com/manickyoj/robo_team_charlie/master/documentation/Charlie Brain Flow.svg)
