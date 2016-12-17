@@ -23,31 +23,38 @@ sensor_msgs::LaserScan filtered_scan;
 ros::Publisher pub_filtered_scan;
 ros::Publisher pub_flag;
 ros::Publisher pub_vel;
-// ros::Publisher pub_ang;
+ros::Publisher pub_ang;
 
 std_msgs::Int8 flag;
 
 
 int rolling_length = 5;
 
+//key: { , , , , max backwards, stop, max forward, )
+
 int backward[22] = {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                    0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
+
 int stop[22] =     {0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                    0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
+
 int forward[22] =  {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int right[22] =   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-										0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0};
-int straight[22] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
-int left[22] =     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-										0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0};
+                    0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
+
+int right[22] =   {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+                   0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0};
+
+int straight[22] = {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
+
+int left[22] =     {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0};
 
 
 void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
 {
 	// DEBUG
-	ROS_INFO("Received Scan");
+	//ROS_INFO("Received Scan");
 
 
 
@@ -73,27 +80,26 @@ void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
 					forward_distance = scan.ranges[i];
 	}
 
-
-	ROS_INFO("Forward distance: %lf", forward_distance);
-	if (forward_distance < .3)
+	//ROS_INFO("Forward distance: %lf", forward_distance);
+	if (forward_distance < .2)
 	{
 		// Move backward
 		flag.data=1; //avoiding obstacles
-		ROS_INFO("Backward");
+	//	ROS_INFO("Backward");
 		cmd_array.data.assign(backward, backward+22);
 	}
-	else if (forward_distance < .6)
+	else if (forward_distance < .3)
 	{
 		// Stop
 		flag.data=1; //avoiding obstacles
-		ROS_INFO("Stop");
+		//ROS_INFO("Stop");
 		cmd_array.data.assign(stop, stop+22);
 	}
 	else
 	{
 		// Move forward
 		flag.data=0; //not avoiding obstacles
-		ROS_INFO("Forward");
+		//ROS_INFO("Forward");
 		cmd_array.data.assign(forward, forward+22);
 		//ROS_INFO_STREAM(cmd_array);
 	}
@@ -104,7 +110,7 @@ void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
 	cmd_array.data.clear();
 
 	// DEBUG
-	ROS_INFO("Publishing Output");
+    //ROS_INFO("Publishing Output");
 
 }
 
@@ -178,7 +184,7 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 
 
 
-		ROS_INFO("average_range: %f", average_range);
+		//ROS_INFO("average_range: %f", average_range);
 		ROS_INFO("rolling_average_range: %f", rolling_average_range);
 
 		if(rolling_average_range < 1.2)
@@ -205,14 +211,17 @@ int main(int argc, char **argv)
 
 	ros::NodeHandle n;
 
+
+	pub_flag = n.advertise<std_msgs::Int8>("obst/avoid",1000);
+	pub_vel =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000);
+	pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
+	pub_filtered_scan =n.advertise<sensor_msgs::LaserScan>("obst/filtered_scan", 1000);
+	// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
+
 	ros::Subscriber sub_imu = n.subscribe("scan", 1000, controlSpeed);
 	ros::Subscriber sub_lidar = n.subscribe("scan",1000,getLIDAR);
 
-	ros::Publisher pub_flag = n.advertise<std_msgs::Int8>("obst/avoid",1000);
-	ros::Publisher pub_vel =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_vel", 1000);
-	// ros::Publisher pub_ang =n.advertise<std_msgs::Int8MultiArray>("obst/cmd_dir", 1000);
-	ros::Publisher pub_filtered_scan =n.advertise<sensor_msgs::LaserScan>("obst/filtered_scan", 1000);
-	// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
+
 
 	ros::spin();
 

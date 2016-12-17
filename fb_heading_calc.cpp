@@ -91,11 +91,14 @@ void DirectionFinder::recalculateHeading() {
 	chatter(ss.str());
 
 	// Calculate waypoint direction vector
-	double deltaX = waypoint->getX()-position->getX();
-	double deltaY = waypoint->getY()-position->getY();
+	double deltaXw = waypoint->getX();
+	double deltaXp = position->getX();
+	double deltaX = deltaXw - deltaXp;
 
-	ss << "Deltas: (" << deltaX << ", " << deltaY << ")\n";
-	chatter(ss.str());
+	double deltaYw = waypoint->getY();
+	double deltaYp = position->getY();
+	double deltaY = deltaYw - deltaYp;
+
 
 	// Angle between heading to waypoint and true North
 	// Left is positive, right is negative
@@ -116,13 +119,13 @@ void DirectionFinder::recalculateHeading() {
 	chatter(ss.str());
 
 	// Calculate the angular and linear vel outputs
-	double angular_vel = scale(-headingChange, M_PI, ANGULAR_MAX);
+	double angular_vel = scale(headingChange, M_PI, LINEAR_MAX);
 	double linear_vel = LINEAR_MAX;
 
 	// Publish the desired cmd_vel array
 	std_msgs::Int8MultiArray cmd_vel;
-	cmd_vel.data.push_back(int(linear_vel));
-	cmd_vel.data.push_back(int(angular_vel));
+	cmd_vel.data.push_back(char(int(linear_vel)));
+	cmd_vel.data.push_back(char(int(angular_vel)));
 	output.publish(cmd_vel);
 }
 
@@ -211,7 +214,7 @@ int main(int argc, char* argv[])
 {
 	// Initialize DirectionFinder
 	ros::init(argc, argv, "heading_calculator");
-	DirectionFinder d;
+	DirectionFinder d();
 	ros::spin();
 	return 0;
 }
