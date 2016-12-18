@@ -18,6 +18,8 @@ std::vector<float> average_ranges;
 
 sensor_msgs::LaserScan scan;
 sensor_msgs::LaserScan filtered_scan;
+sensor_msgs::LaserScan filtered_scan_left;
+sensor_msgs::LaserScan filtered_scan_right;
 
 // ros::Publisher pub_arb;
 ros::Publisher pub_filtered_scan;
@@ -31,6 +33,9 @@ std_msgs::Int8 flag;
 int rolling_length = 5;
 
 //key: { , , , , max backwards, stop, max forward, )
+
+void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
+;
 
 int backward[22] = {0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
@@ -95,7 +100,12 @@ void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
 		ROS_INFO("Stop");
 		cmd_array.data.assign(stop, stop+22);
 	}
-	else
+	else if (forward_distance < 0.7)
+    {
+        flag.data = 1;
+        ROS_INFO("Avoid");
+        getLIDAR(lidar_scan);
+    }
 	{
 		// Move forward
 		flag.data=0; //not avoiding obstacles
@@ -160,6 +170,11 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 		{
 				filtered_scan.ranges[i] = 0;
 		}
+	ROS_INFO("number of ranges %f", number_of_ranges);
+/*
+		for (float i = number_of_ranges/6; i < number_of_ranges/3; i++ ){
+			filtered_scan_left.ranges[i] = filtered_scan.ranges[i];
+		}*/
 
 		// Calculate average range
 		average_range /= distances_counted;
@@ -188,18 +203,11 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 		//ROS_INFO("average_range: %f", average_range);
 		ROS_INFO("rolling_average_range: %f", rolling_average_range);
 
-		if( rolling_average_range < 1.9)
-		{if( rolling_average_range > 0.5) {
-                cmd_array.data.assign(right, right+22);
-				ROS_INFO("RIGHT");}
-            else{
-                cmd_array.data.assign(straight, straight+22);
-                ROS_INFO("STRAIGHT");
+		if( rolling_average_range > 1.3) {
+            if (rolling_average_range > 0.5) {
+                cmd_array.data.assign(right, right + 22);
+                ROS_INFO("RIGHT");
             }
-            }
-		else if(rolling_average_range > 1.65)
-		{cmd_array.data.assign(straight, straight+22);
-				ROS_INFO("STRAIGHT");
         }
 		else{
 				cmd_array.data.assign(left, left+22);
@@ -213,7 +221,6 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 
 }
 
-//I probably messed something up in implementation here. If someone could check me that'd be great
 int main(int argc, char **argv)
 {
 	flag.data=0;
@@ -231,7 +238,7 @@ int main(int argc, char **argv)
 	// ros::Publisher pub_arb =n.advertise<std_msgs::Int8MultiArray>("obst/arb", 1000);
 
 	ros::Subscriber sub_imu = n.subscribe("scan", 1000, controlSpeed);
-	ros::Subscriber sub_lidar = n.subscribe("scan",1000,getLIDAR);
+	ros::Subscriber sub_lidar = n.subscribe("scan",1000,controlSpeed);
 
 
 
