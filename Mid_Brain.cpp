@@ -41,7 +41,7 @@ int stop[22] =     {0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,
 int forward[22] =  {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0};
 
-int right[22] =   {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
+int right[22] =    {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
                    0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0};
 
 int straight[22] = {0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0,
@@ -80,26 +80,26 @@ void controlSpeed(const sensor_msgs::LaserScan lidar_scan)
 					forward_distance = scan.ranges[i];
 	}
 
-	//ROS_INFO("Forward distance: %lf", forward_distance);
+	ROS_INFO("Forward distance: %lf", forward_distance);
 	if (forward_distance < .2)
 	{
 		// Move backward
 		flag.data=1; //avoiding obstacles
-	//	ROS_INFO("Backward");
+		ROS_INFO("Backward");
 		cmd_array.data.assign(backward, backward+22);
 	}
 	else if (forward_distance < .3)
 	{
 		// Stop
 		flag.data=1; //avoiding obstacles
-		//ROS_INFO("Stop");
+		ROS_INFO("Stop");
 		cmd_array.data.assign(stop, stop+22);
 	}
 	else
 	{
 		// Move forward
 		flag.data=0; //not avoiding obstacles
-		//ROS_INFO("Forward");
+		ROS_INFO("Forward");
 		cmd_array.data.assign(forward, forward+22);
 		//ROS_INFO_STREAM(cmd_array);
 	}
@@ -126,13 +126,13 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 	filtered_scan.angle_increment = lidar_scan.angle_increment;
 	filtered_scan.range_max = lidar_scan.range_max;
 	filtered_scan.range_min = lidar_scan.range_min;
-	std::vector<int> indices;
+	//std::vector<int> indices;
 
 	long number_of_ranges = lidar_scan.ranges.size();
 
 	float average_range = 0.0;
 
-	float rolling_average_range = 0.0;
+	float rolling_average_range;
 
 	// Remove junk values from scan data (0.0 is out of range or no read)
 	for(int i=0; i < number_of_ranges; i++)
@@ -179,7 +179,8 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 		float sum=0;
 
 		//adding up the array
-		for ( int i=0; i<average_ranges.size(); i++ ) sum += average_ranges[i];
+		for ( int i=0; i<average_ranges.size(); i++ ) {
+			sum += average_ranges[i];}
 		rolling_average_range=sum/average_ranges.size(); //final average
 
 
@@ -187,12 +188,23 @@ void getLIDAR(const sensor_msgs::LaserScan lidar_scan)
 		//ROS_INFO("average_range: %f", average_range);
 		ROS_INFO("rolling_average_range: %f", rolling_average_range);
 
-		if(rolling_average_range < 1.2)
-				cmd_array.data.assign(right, right+22);
+		if( rolling_average_range < 1.9)
+		{if( rolling_average_range > 0.5) {
+                cmd_array.data.assign(right, right+22);
+				ROS_INFO("RIGHT");}
+            else{
+                cmd_array.data.assign(straight, straight+22);
+                ROS_INFO("STRAIGHT");
+            }
+            }
 		else if(rolling_average_range > 1.65)
-				cmd_array.data.assign(straight, straight+22);
-		else
+		{cmd_array.data.assign(straight, straight+22);
+				ROS_INFO("STRAIGHT");
+        }
+		else{
 				cmd_array.data.assign(left, left+22);
+				ROS_INFO("LEFT");
+        }
 
 	pub_filtered_scan.publish(filtered_scan);
 

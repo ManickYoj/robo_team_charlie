@@ -60,17 +60,17 @@ class Midbrain_Arbiter(object):
 		print(turn)
 		msg = Twist()
 		if vel == 6:
-			msg.linear.x = 40
+			msg.linear.x = 20
 		elif vel == 5:
 			msg.linear.x = 0
 		elif vel == 4:
 			msg.linear.x = -10
 		if turn == 6:
-			msg.angular.z = 40
+			msg.angular.z = -10
 		elif turn == 5:
 			msg.angular.z = 0
 		elif turn == 4:
-			msg.angular.z = -40
+			msg.angular.z = 10
 		#msg.linear.x = 2*vel/(ARRAY_SIZE-1)-1
 		#msg.angular.z = 2*turn/(ARRAY_SIZE-1)-1
 		#print msg.linear.x
